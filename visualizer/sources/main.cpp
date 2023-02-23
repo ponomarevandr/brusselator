@@ -1,13 +1,15 @@
-#include "TF1.h"
-#include "TCanvas.h"
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Box.H>
 
-
-int main(int argc, char* argv[]) {
-   TCanvas* c = new TCanvas("c", "Something", 0, 0, 800, 600);
-   TF1 *f1 = new TF1("f1","sin(x)", -5, 5);
-   f1->SetLineColor(kBlue+1);
-   f1->SetTitle("My graph;x; sin(x)");
-   f1->Draw();
-   c->Print("demo1.pdf");
-   return 0;
+int main(int argc, char **argv) {
+  Fl_Window *window = new Fl_Window(300,180);
+  Fl_Box *box = new Fl_Box(20,40,260,100,"Hello, World!");
+  box->box(FL_UP_BOX);
+  box->labelsize(36);
+  box->labelfont(FL_BOLD+FL_ITALIC);
+  box->labeltype(FL_SHADOW_LABEL);
+  window->end();
+  window->show(argc, argv);
+  return Fl::run();
 }
