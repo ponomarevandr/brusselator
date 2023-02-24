@@ -8,23 +8,21 @@ echo "==================== Setting path to Root..."
 if [ ! -f root_path.txt ];
 then
 	echo "Enter the path to the folder of Root:"
-	read -r ROOT_FOLDER
-	echo "${ROOT_FOLDER}" > root_path.txt
+	read -r ROOT_DIR
+	echo "${ROOT_DIR}" > root_path.txt
 fi
-read -r ROOT_FOLDER < root_path.txt
-echo "From folder ${ROOT_FOLDER}"
-ROOT_DIR="${ROOT_FOLDER}/cmake"
+read -r ROOT_DIR < root_path.txt
+echo "From folder ${ROOT_DIR}"
 export ROOT_DIR
 echo "==================== Setting path to FLTK..."
 if [ ! -f fltk_path.txt ];
 then
 	echo "Enter the path to the folder of FLTK:"
-	read -r FLTK_FOLDER
-	echo "${FLTK_FOLDER}" > fltk_path.txt
+	read -r FLTK_DIR
+	echo "${FLTK_DIR}" > fltk_path.txt
 fi
-read -r FLTK_FOLDER < fltk_path.txt
-echo "From folder ${FLTK_FOLDER}"
-FLTK_DIR="${FLTK_FOLDER}/build"
+read -r FLTK_DIR < fltk_path.txt
+echo "From folder ${FLTK_DIR}"
 export FLTK_DIR
 echo "==================== Running CMake..."
 cmake ..

@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.0)
 project(Visualizer)
 
 set(SOURCES
-	
+	sources/geometry/basics.cpp
+	sources/plotter/plotter.cpp
 )
 
 find_package(ROOT REQUIRED COMPONENTS RIO Net)
