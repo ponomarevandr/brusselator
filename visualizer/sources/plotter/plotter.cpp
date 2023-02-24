@@ -23,6 +23,9 @@ std::string plot(size_t width, size_t height, const std::vector<SegmentedLine>& 
 	TImageDump* image_dump = new TImageDump(filename.c_str());
 	canvas->Paint();
 	image_dump->Close();
+	delete canvas;
+	delete multigraph;
+	delete image_dump;
 	return filename;
 }
 
