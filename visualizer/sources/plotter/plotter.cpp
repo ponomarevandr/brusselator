@@ -1,5 +1,7 @@
 #include "plotter.h"
 
+#include <memory>
+
 #include "TGraph.h"
 #include "TMultiGraph.h"
 #include "TCanvas.h"
@@ -8,25 +10,20 @@
 
 namespace Plotter {
 
-std::string plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines,
-		bool high_quality) {
-	TCanvas* canvas = new TCanvas("canvas", "graph", 0, 0, width, height);
+std::string plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines) {
+	auto canvas = std::make_unique<TCanvas>("canvas", "graph", 0, 0, width, height);
 	canvas->SetGrid();
-	TMultiGraph* multigraph = new TMultiGraph();
+	auto multigraph = std::make_unique<TMultiGraph>();
 	for (const SegmentedLine& line : lines) {
 		TGraph* graph = new TGraph(line.size(), line.xsBuffer(), line.ysBuffer());
 		graph->SetLineColor(kRed);
 		multigraph->Add(graph);
 	}
 	multigraph->Draw("AL");
-	std::string filename = high_quality ? "graph.png" : "graph.jpeg";
-	TImageDump* image_dump = new TImageDump(filename.c_str());
+	auto image_dump = std::make_unique<TImageDump>("graph.png");
 	canvas->Paint();
 	image_dump->Close();
-	delete canvas;
-	delete multigraph;
-	delete image_dump;
-	return filename;
+	return "graph.png";
 }
 
 }

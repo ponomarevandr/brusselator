@@ -6,6 +6,8 @@ project(Visualizer)
 set(SOURCES
 	sources/geometry/basics.cpp
 	sources/plotter/plotter.cpp
+	sources/viewer/application.cpp
+	sources/viewer/viewer_window.cpp
 )
 
 find_package(ROOT REQUIRED COMPONENTS RIO Net)
@@ -18,4 +20,4 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 include_directories(sources)
 
 add_executable(visualizer sources/main.cpp ${SOURCES})
-target_link_libraries(visualizer ${ROOT_LIBRARIES} fltk)
+target_link_libraries(visualizer ${ROOT_LIBRARIES} fltk fltk_images)
