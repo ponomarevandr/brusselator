@@ -33,9 +33,10 @@ void ViewerWindow::redrawImage() {
 	line.push_back(Point(2, 1));
 	line.push_back(Point(2, -2));
 	lines.push_back(std::move(line));
-	std::string filename = Plotter::plot(800, 600, lines);
+	Plotter::Image image = Plotter::plot(800, 600, lines);
 
-	graph = std::make_unique<Fl_PNG_Image>(filename.c_str());
+	graph = std::make_unique<Fl_PNG_Image>(nullptr, image.getBuffer<unsigned char>(),
+		image.getSize());
 	graph_box->image(graph.get());
 	redraw();
 }

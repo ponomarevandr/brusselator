@@ -1,16 +1,20 @@
 #include "plotter.h"
 
-#include <memory>
-
 #include "TGraph.h"
 #include "TMultiGraph.h"
 #include "TCanvas.h"
-#include "TImageDump.h"
+#include "TImage.h"
 
 
 namespace Plotter {
 
-std::string plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines) {
+Image::Image(char* buffer, int size): buffer(buffer), size(size) {}
+
+int Image::getSize() const {
+	return size;
+}
+
+Image plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines) {
 	auto canvas = std::make_unique<TCanvas>("canvas", "graph", 0, 0, width, height);
 	canvas->SetGrid();
 	auto multigraph = std::make_unique<TMultiGraph>();
@@ -20,10 +24,12 @@ std::string plot(size_t width, size_t height, const std::vector<SegmentedLine>& 
 		multigraph->Add(graph);
 	}
 	multigraph->Draw("AL");
-	auto image_dump = std::make_unique<TImageDump>("graph.png");
-	canvas->Paint();
-	image_dump->Close();
-	return "graph.png";
+	std::unique_ptr<TImage> image(TImage::Create());
+	image->FromPad(canvas.get());
+	char* buffer;
+	int size;
+	image->GetImageBuffer(&buffer, &size);
+	return Image(buffer, size);
 }
 
 }
