@@ -12,9 +12,10 @@ namespace Plotter {
 class Image {
 private:
 	std::unique_ptr<char> buffer;
-	int size;
+	int size = 0;
 
 public:
+	Image() = default;
 	Image(char* buffer, int size);
 
 	template<typename ReturnType>
@@ -23,7 +24,10 @@ public:
 	}
 
 	int getSize() const;
+	bool isValid() const;
+	void save(const std::string& filename) const;
 };
+
 
 Image plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines);
 

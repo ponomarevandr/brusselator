@@ -1,5 +1,7 @@
 #include "plotter.h"
 
+#include <stdio.h>
+
 #include "TGraph.h"
 #include "TMultiGraph.h"
 #include "TCanvas.h"
@@ -13,6 +15,18 @@ Image::Image(char* buffer, int size): buffer(buffer), size(size) {}
 int Image::getSize() const {
 	return size;
 }
+
+bool Image::isValid() const {
+	return buffer.get();
+}
+
+void Image::save(const std::string& filename) const {
+	FILE* out_file;
+    out_file = fopen(filename.c_str(), "wb");
+    fwrite(buffer.get(), 1, size, out_file);
+    fclose(out_file);
+}
+
 
 Image plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines) {
 	auto canvas = std::make_unique<TCanvas>("canvas", "graph", 0, 0, width, height);
