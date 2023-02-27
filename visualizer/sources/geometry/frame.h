@@ -1,6 +1,7 @@
 #pragma once
 
 #include "geometry/basics.h"
+#include "geometry/vector_field.h"
 
 #include <vector>
 
@@ -24,3 +25,4 @@ public:
 
 void frameTranslate(const Frame& source, const Frame& target, Point& point);
 void frameTranslate(const Frame& source, const Frame& target, std::vector<SegmentedLine>& lines);
+void frameTranslate(const Frame& source, const Frame& target, VectorField& field);

@@ -135,6 +135,12 @@ Vector turned(const Vector& vector, double angle) {
 	return Vector(vector.x * cos - vector.y * sin, vector.x * sin + vector.y * cos);
 }
 
+Vector normalized(const Vector& vector) {
+	Vector result = vector;
+	result /= vector.length();
+	return result;
+}
+
 
 double degreesToRadians(double degrees) {
 	return degrees / 180.0 * PI;

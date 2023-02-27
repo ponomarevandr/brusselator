@@ -5,6 +5,7 @@ project(Visualizer)
 
 set(SOURCES
 	sources/geometry/basics.cpp
+	sources/geometry/vector_field.cpp
 	sources/geometry/frame.cpp
 	sources/plotter/plotter.cpp
 	sources/viewer/application.cpp
