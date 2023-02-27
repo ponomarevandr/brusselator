@@ -25,6 +25,9 @@ read -r FLTK_DIR < fltk_path.txt
 echo "From folder ${FLTK_DIR}"
 export FLTK_DIR
 echo "==================== Running CMake..."
+echo "With custom flags $1"
+CUSTOM_FLAGS="$1"
+export CUSTOM_FLAGS
 cmake ..
 if [ $? -ne 0 ]; then
 	exit 1

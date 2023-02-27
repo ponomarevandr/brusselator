@@ -11,16 +11,22 @@ namespace Plotter {
 
 class Image {
 private:
-	std::unique_ptr<char> buffer;
+	void* buffer = nullptr;
 	int size = 0;
 
 public:
 	Image() = default;
-	Image(char* buffer, int size);
+	Image(void* buffer, int size);
+	Image(const Image&) = delete;
+	Image(Image&&);
+	~Image();
+
+	Image& operator=(const Image&) = delete;
+	Image& operator=(Image&&);
 
 	template<typename ReturnType>
 	ReturnType* getBuffer() const {
-		return reinterpret_cast<ReturnType*>(reinterpret_cast<void*>(buffer.get()));
+		return reinterpret_cast<ReturnType*>(buffer);
 	}
 
 	int getSize() const;

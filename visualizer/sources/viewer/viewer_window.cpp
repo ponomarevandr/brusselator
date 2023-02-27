@@ -2,6 +2,7 @@
 
 #include "geometry/basics.h"
 
+#include <cstdlib>
 #include <algorithm>
 
 #include <FL/Fl_PNG_Image.H>
@@ -13,12 +14,12 @@ void ViewerWindow::redrawButtonCallback(Fl_Widget* widget, void* ptr) {
 }
 
 void ViewerWindow::saveButtonCallback(Fl_Widget* widget, void* ptr) {
-	std::unique_ptr<char> filename;
-	filename.reset(fl_file_chooser("Введите имя файла", ".png", ".png", 0));
+	char* filename = fl_file_chooser("Введите имя файла", ".png", ".png", 0);
 	if (!filename)
 		return;
-	if (!static_cast<ViewerWindow*>(ptr)->saveImage(filename.get()))
+	if (!static_cast<ViewerWindow*>(ptr)->saveImage(filename))
 		fl_message("Изображение отсутствует!");
+	free(filename);
 }
 
 ViewerWindow::ViewerWindow():

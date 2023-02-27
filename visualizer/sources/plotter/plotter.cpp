@@ -1,6 +1,7 @@
 #include "plotter.h"
 
 #include <stdio.h>
+#include <cstdlib>
 
 #include "TGraph.h"
 #include "TMultiGraph.h"
@@ -10,20 +11,40 @@
 
 namespace Plotter {
 
-Image::Image(char* buffer, int size): buffer(buffer), size(size) {}
+Image::Image(void* buffer, int size): buffer(buffer), size(size) {}
+
+Image::Image(Image&& other): buffer(other.buffer), size(other.size) {
+	other.buffer = nullptr;
+	other.size = 0;
+}
+
+Image::~Image() {
+	if (buffer)
+		free(buffer);
+}
+
+Image& Image::operator=(Image&& other) {
+	if (buffer)
+		free(buffer);
+	buffer = other.buffer;
+	size = other.size;
+	other.buffer = nullptr;
+	other.size = 0;
+	return *this;
+}
 
 int Image::getSize() const {
 	return size;
 }
 
 bool Image::isValid() const {
-	return buffer.get();
+	return buffer;
 }
 
 void Image::save(const std::string& filename) const {
 	FILE* out_file;
     out_file = fopen(filename.c_str(), "wb");
-    fwrite(buffer.get(), 1, size, out_file);
+    fwrite(buffer, 1, size, out_file);
     fclose(out_file);
 }
 

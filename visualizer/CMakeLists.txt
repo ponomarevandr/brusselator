@@ -10,6 +10,8 @@ set(SOURCES
 	sources/viewer/viewer_window.cpp
 )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{CUSTOM_FLAGS}")
+
 find_package(ROOT REQUIRED COMPONENTS RIO Net)
 include(${ROOT_USE_FILE})
 
@@ -20,4 +22,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 include_directories(sources)
 
 add_executable(visualizer sources/main.cpp ${SOURCES})
-target_link_libraries(visualizer ${ROOT_LIBRARIES} fltk fltk_images)
+# ${ROOT_LIBRARIES} can be used
+target_link_libraries(visualizer Core Hist Graf Gpad fltk fltk_images)
