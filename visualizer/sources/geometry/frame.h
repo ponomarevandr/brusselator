@@ -20,8 +20,8 @@ public:
 	const Point& getTopRight() const;
 	double width() const;
 	double height() const;
+	bool isPointInside(const Point&) const;
 };
-
 
 void frameTranslate(const Frame& source, const Frame& target, Point& point);
 void frameTranslate(const Frame& source, const Frame& target, std::vector<SegmentedLine>& lines);

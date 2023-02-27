@@ -58,6 +58,7 @@ Image plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines)
 		std::vector<double> ys = segmentedLineYs(line);
 		TGraph* graph = new TGraph(line.size(), xs.data(), ys.data());
 		graph->SetLineColor(kRed);
+		graph->SetLineWidth(2);
 		multigraph->Add(graph);
 	}
 	multigraph->Draw("AL");

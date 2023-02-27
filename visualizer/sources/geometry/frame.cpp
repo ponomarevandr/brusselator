@@ -25,6 +25,16 @@ double Frame::height() const {
 	return top_right.y - bottom_left.y;
 }
 
+bool Frame::isPointInside(const Point& point) const {
+	Vector bottom_left_to_point = point - bottom_left;
+	if (bottom_left_to_point.x < 0 || bottom_left_to_point.y < 0)
+		return false;
+	Vector point_to_top_right = top_right - point;
+	if (point_to_top_right.x < 0 || point_to_top_right.y < 0)
+		return false;
+	return true;
+}
+
 
 void frameTranslate(const Frame& source, const Frame& target, Point& point) {
 	point -= Vector(source.getBottomLeft());

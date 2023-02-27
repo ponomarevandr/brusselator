@@ -10,6 +10,7 @@ set(SOURCES
 	sources/plotter/plotter.cpp
 	sources/viewer/application.cpp
 	sources/viewer/viewer_window.cpp
+	sources/tracker/tracker.cpp
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{CUSTOM_FLAGS}")

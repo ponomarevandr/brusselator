@@ -135,6 +135,10 @@ Vector turned(const Vector& vector, double angle) {
 	return Vector(vector.x * cos - vector.y * sin, vector.x * sin + vector.y * cos);
 }
 
+double distance(const Point& first, const Point& second) {
+	return (second - first).length();
+}
+
 Vector normalized(const Vector& vector) {
 	Vector result = vector;
 	result /= vector.length();

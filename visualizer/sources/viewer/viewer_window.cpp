@@ -1,6 +1,9 @@
 #include "viewer_window.h"
 
 #include "geometry/basics.h"
+#include "geometry/vector_field.h"
+#include "geometry/frame.h"
+#include "tracker/tracker.h"
 
 #include <cstdlib>
 #include <algorithm>
@@ -32,20 +35,27 @@ ViewerWindow::ViewerWindow():
 	save_button->callback(ViewerWindow::saveButtonCallback, this);
 }
 
+double vx(double x, double y) {
+	return -y + 0.15 * (-x);
+}
+
+double vy(double x, double y) {
+	return x + 0.15 * (-y);
+}
+
 void ViewerWindow::redrawImage() {
-	std::vector<SegmentedLine> lines;
-	SegmentedLine line;
-	line.push_back(Point(0, 0));
-	line.push_back(Point(1, 1));
-	line.push_back(Point(1, 2));
-	line.push_back(Point(0, 1.5));
-	lines.push_back(std::move(line));
-	line = SegmentedLine();
-	line.push_back(Point(0, 0));
-	line.push_back(Point(2, 1));
-	line.push_back(Point(2, -2));
-	lines.push_back(std::move(line));
-	graph_image = Plotter::plot(800, 600, lines);
+	VectorField field(vx, vy);
+	Frame frame(Point(-1.0, -1.0 * 417 / 580), 2, 2.0 * 417 / 580);
+	Tracker tracker(field, 0.00001, frame);
+	std::vector<SegmentedLine> tracks = tracker.getAllTracks();
+	tracks.emplace_back();
+	tracks.back().push_back(frame.getBottomLeft());
+	tracks.back().push_back(frame.getBottomLeft() + Vector(0, frame.height()));
+	tracks.back().push_back(frame.getTopRight());
+	tracks.back().push_back(frame.getTopRight() - Vector(0, frame.height()));
+	tracks.back().push_back(frame.getBottomLeft());
+
+	graph_image = Plotter::plot(800, 600, tracks);
 
 	graph_fltk_image = std::make_unique<Fl_PNG_Image>(nullptr,
 		graph_image.getBuffer<unsigned char>(), graph_image.getSize());
