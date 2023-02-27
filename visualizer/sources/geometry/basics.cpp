@@ -1,33 +1,162 @@
 #include "basics.h"
 
+#include <iostream>
+#include <cmath>
+
+
+const double PI = 3.14159265358979323846;
+
 
 Point::Point(double x, double y): x(x), y(y) {}
 
 Point::Point(const Vector& vector): x(vector.x), y(vector.y) {}
+
+Point& Point::operator+=(const Vector& vector) {
+	x += vector.x;
+	y += vector.y;
+	return *this;
+}
+
+Point& Point::operator-=(const Vector& vector) {
+	x -= vector.x;
+	y -= vector.y;
+	return *this;
+}
+
+void Point::print() const {
+	std::cout << "Point(" << x << ", " << y << ")\n";
+}
 
 
 Vector::Vector(double x, double y): x(x), y(y) {}
 
 Vector::Vector(const Point& point): x(point.x), y(point.y) {}
 
-
-void SegmentedLine::push_back(const Point& point) {
-	xs.push_back(point.x);
-	ys.push_back(point.y);
+Vector& Vector::operator+=(const Vector& other) {
+	x += other.x;
+	y += other.y;
+	return *this;
 }
 
-Point SegmentedLine::operator[](size_t index) const {
-	return Point(xs[index], ys[index]);
+Vector& Vector::operator-=(const Vector& other) {
+	x -= other.x;
+	y -= other.y;
+	return *this;
 }
 
-size_t SegmentedLine::size() const {
-	return xs.size();
+Vector& Vector::operator*=(double coefficient) {
+	x *= coefficient;
+	y *= coefficient;
+	return *this;
 }
 
-const double* SegmentedLine::xsBuffer() const {
-	return xs.data();
+Vector& Vector::operator/=(double coefficient) {
+	x /= coefficient;
+	y /= coefficient;
+	return *this;
 }
 
-const double* SegmentedLine::ysBuffer() const {
-	return ys.data();
+double Vector::lengthSquared() const {
+	return x * x + y * y;
+}
+
+double Vector::length() const {
+	return std::sqrt(lengthSquared());
+}
+
+void Vector::print() const {
+	std::cout << "Vector(" << x << ", " << y << ")\n";
+}
+
+
+Point operator+(const Point& point, const Vector& vector) {
+	Point result = point;
+	result += vector;
+	return result;
+}
+
+Point operator-(const Point& point, const Vector& vector) {
+	Point result = point;
+	result -= vector;
+	return result;
+}
+
+Vector operator-(const Point& end, const Point& begin) {
+	return Vector(end.x - begin.x, end.y - begin.y);
+}
+
+Vector operator+(const Vector& first, const Vector& second) {
+	Vector result = first;
+	result += second;
+	return result;
+}
+
+Vector operator-(const Vector& first, const Vector& second) {
+	Vector result = first;
+	result -= second;
+	return result;
+}
+
+Vector operator*(double coefficient, const Vector& vector) {
+	Vector result = vector;
+	result *= coefficient;
+	return result;
+}
+
+Vector operator/(double coefficient, const Vector& vector) {
+	Vector result = vector;
+	result /= coefficient;
+	return result;
+}
+
+double crossProduct(const Vector& first, const Vector& second) {
+	return first.x * second.y - first.y * second.x;
+}
+
+double dotProduct(const Vector& first, const Vector& second) {
+	return first.x * second.x + first.y * second.y;
+}
+
+Vector turnedLeft(const Vector& vector) {
+	return Vector(-vector.y, vector.x);
+}
+
+Vector operator-(const Vector& vector) {
+	return Vector(-vector.x, -vector.y);
+}
+
+Vector turnedRight(const Vector& vector) {
+	return Vector(vector.y, -vector.x);
+}
+
+Vector turned(const Vector& vector, double angle) {
+	double sin = std::sin(angle);
+	double cos = std::cos(angle);
+	return Vector(vector.x * cos - vector.y * sin, vector.x * sin + vector.y * cos);
+}
+
+
+double degreesToRadians(double degrees) {
+	return degrees / 180.0 * PI;
+}
+
+double radiansToDegrees(double radians) {
+	return radians / PI * 180.0;
+}
+
+
+std::vector<double> segmentedLineXs(const SegmentedLine& line) {
+	std::vector<double> result;
+	for (const Point& point : line) {
+		result.push_back(point.x);
+	}
+	return result;
+}
+
+std::vector<double> segmentedLineYs(const SegmentedLine& line) {
+	std::vector<double> result;
+	for (const Point& point : line) {
+		result.push_back(point.y);
+	}
+	return result;
 }

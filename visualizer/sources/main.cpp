@@ -1,5 +1,4 @@
 #include "geometry/basics.h"
-#include "plotter/plotter.h"
 #include "viewer/application.h"
 
 
