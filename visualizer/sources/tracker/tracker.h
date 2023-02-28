@@ -35,7 +35,7 @@ private:
 	void addTrack(const Point& start);
 
 public:
-	Tracker(const VectorField& field, const Frame& zone, double step = 0.0005, double plot_step = 0.01,
-		double max_between_tracks = 0.05, double min_between_tracks = 0.02);
+	Tracker(const VectorField& field, const Frame& zone, double step = 0.001, double plot_step = 0.01,
+		double max_between_tracks = 0.04, double min_between_tracks = 0.02);
 	std::vector<SegmentedLine> getTracks();
 };

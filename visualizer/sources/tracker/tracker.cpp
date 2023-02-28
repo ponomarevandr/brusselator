@@ -38,7 +38,8 @@ void Tracker::addPointAndTakeIntersections(const Point& point) {
 void Tracker::goAlongTrack(const Point& start, double direction) {
 	Point current = start;
 	current_track.push_back(current);
-	tail.push_back(current);
+	if (direction > 0)
+		tail.push_back(current);
 	double travelled_distance = 0;
 	double latest_plot_distance = 0;
 	double latest_bounding_distane = 0;
@@ -89,7 +90,7 @@ void Tracker::addTrack(const Point& start) {
 	goAlongTrack(start, 1);
 	tracks.push_back(std::move(current_track));
 	for (const Point& point : tail) {
-		base.addPoint(point);
+		addPointAndTakeIntersections(point);
 	}
 	tail.clear();
 }

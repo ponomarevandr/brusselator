@@ -37,16 +37,17 @@ ViewerWindow::ViewerWindow():
 }
 
 double vx(double x, double y) {
-	return y;
+	return 1 - 4 * x + x * x * y;
 }
 
 double vy(double x, double y) {
-	return (x + 0.2) * (x - 0.2);
+	return 3 * x - x * x * y;
 }
 
 void ViewerWindow::redrawImage() {
 	VectorField field(vx, vy);
-	Frame frame(Point(-1.0, -1.0 * 417 / 580), 2, 2.0 * 417 / 580);
+	//Frame frame(Point(-1.0, -1.0 * 417 / 580), 2, 2.0 * 417 / 580);
+	Frame frame(Point(-1.0, 0.0), Point(6.0, 5.5));
 	Tracker tracker(field, frame);
 	std::vector<SegmentedLine> tracks = tracker.getTracks();
 	tracks.emplace_back();
