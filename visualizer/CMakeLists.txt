@@ -12,6 +12,7 @@ set(SOURCES
 	sources/viewer/application.cpp
 	sources/viewer/viewer_window.cpp
 	sources/tracker/tracker.cpp
+	sources/tracker/neighbours_base.cpp
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{CUSTOM_FLAGS}")

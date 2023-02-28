@@ -5,7 +5,7 @@
 
 Circle::Circle(const Point& center, double r): center(center), r(r) {}
 
-bool Circle::isInside(const Point& point) const {
+bool Circle::isPointInside(const Point& point) const {
 	return distance(center, point) <= r;
 }
 

@@ -11,7 +11,7 @@ struct Circle {
 
 	Circle() = default;
 	Circle(const Point& center, double r);
-	bool isInside(const Point&) const;
+	bool isPointInside(const Point&) const;
 };
 
 std::vector<Point> intersectionPoints(const Circle&, const Circle&);
