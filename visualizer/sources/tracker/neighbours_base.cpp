@@ -30,6 +30,14 @@ bool NeighboursBase::addPoint(const Point& point) {
 	return true;
 }
 
+void NeighboursBase::clear() {
+	for (size_t i = 0; i < base.size(); ++i) {
+		for (size_t j = 0; j < base[0].size(); ++j) {
+			base[i][j].clear();
+		}
+	}
+}
+
 bool NeighboursBase::hasNeighbours(const Point& point, double radius) const {
 	if (!zone.isPointInside(point))
 		return false;

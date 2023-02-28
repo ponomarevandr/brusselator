@@ -18,6 +18,7 @@ private:
 public:
 	NeighboursBase(const Frame& zone, double max_radius);
 	bool addPoint(const Point&);
+	void clear();
 	bool hasNeighbours(const Point& point, double radius) const;
 	std::vector<Point> getNeighbours(const Point& point, double radius) const;
 };

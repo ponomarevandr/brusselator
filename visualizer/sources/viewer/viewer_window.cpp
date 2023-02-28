@@ -37,18 +37,18 @@ ViewerWindow::ViewerWindow():
 }
 
 double vx(double x, double y) {
-	return -y + 0.15 * (-x) - std::sin(10 * x) * x * 0.5;
+	return y;
 }
 
 double vy(double x, double y) {
-	return x + 0.15 * (-y) - std::sin(10 * y) * y * 0.5;
+	return (x + 0.2) * (x - 0.2);
 }
 
 void ViewerWindow::redrawImage() {
 	VectorField field(vx, vy);
 	Frame frame(Point(-1.0, -1.0 * 417 / 580), 2, 2.0 * 417 / 580);
-	Tracker tracker(field, 0.00001, frame);
-	std::vector<SegmentedLine> tracks = tracker.getAllTracks();
+	Tracker tracker(field, frame);
+	std::vector<SegmentedLine> tracks = tracker.getTracks();
 	tracks.emplace_back();
 	tracks.back().push_back(frame.getBottomLeft());
 	tracks.back().push_back(frame.getBottomLeft() + Vector(0, frame.height()));
