@@ -6,6 +6,7 @@
 #include "tracker/tracker.h"
 
 #include <cstdlib>
+#include <cmath>
 #include <algorithm>
 
 #include <FL/Fl_PNG_Image.H>
@@ -36,11 +37,11 @@ ViewerWindow::ViewerWindow():
 }
 
 double vx(double x, double y) {
-	return -y + 0.15 * (-x);
+	return -y + 0.15 * (-x) - std::sin(10 * x) * x * 0.5;
 }
 
 double vy(double x, double y) {
-	return x + 0.15 * (-y);
+	return x + 0.15 * (-y) - std::sin(10 * y) * y * 0.5;
 }
 
 void ViewerWindow::redrawImage() {

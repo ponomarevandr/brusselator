@@ -5,6 +5,7 @@
 
 
 const double PI = 3.14159265358979323846;
+const double EPS = 1e-6;
 
 
 Point::Point(double x, double y): x(x), y(y) {}
@@ -152,6 +153,15 @@ double degreesToRadians(double degrees) {
 
 double radiansToDegrees(double radians) {
 	return radians / PI * 180.0;
+}
+
+
+double sign(double x) {
+	if (std::abs(x) < EPS)
+		return 0.0;
+	if (x > 0)
+		return 1.0;
+	return -1.0;
 }
 
 

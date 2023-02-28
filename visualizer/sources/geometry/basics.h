@@ -4,6 +4,7 @@
 
 
 extern const double PI;
+extern const double EPS;
 
 
 struct Point;
@@ -55,6 +56,8 @@ Vector normalized(const Vector&);
 
 double degreesToRadians(double);
 double radiansToDegrees(double);
+
+double sign(double);
 
 
 std::vector<double> segmentedLineXs(const SegmentedLine&);

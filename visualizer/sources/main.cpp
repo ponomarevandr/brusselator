@@ -1,6 +1,3 @@
-#include "geometry/basics.h"
-#include "geometry/frame.h"
-#include "geometry/vector_field.h"
 #include "viewer/application.h"
 
 
