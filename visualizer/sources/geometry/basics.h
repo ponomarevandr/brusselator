@@ -44,7 +44,6 @@ Vector operator-(const Point&, const Point&);
 Vector operator+(const Vector&, const Vector&);
 Vector operator-(const Vector&, const Vector&);
 Vector operator*(double, const Vector&);
-Vector operator/(double, const Vector&);
 double crossProduct(const Vector&, const Vector&);
 double dotProduct(const Vector&, const Vector&);
 Vector turnedLeft(const Vector&);

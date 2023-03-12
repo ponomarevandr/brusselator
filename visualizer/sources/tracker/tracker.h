@@ -11,6 +11,16 @@
 
 class Tracker {
 private:
+	struct PointInfo {
+		Point point;
+		Vector direction;
+		double distance;
+
+		PointInfo() = default;
+		PointInfo(const Point& point, const Vector& vector, double distance = 0);
+	};
+
+private:
 	static const double bounding_step_ratio;
 	static const double chasing_ratio;
 	VectorField field;
@@ -19,17 +29,17 @@ private:
 	double max_between_tracks;
 	double min_between_tracks;
 	double bounding_step;
+	double chasing_step;
 	std::vector<SegmentedLine> tracks;
 	NeighboursBase base;
 	std::queue<Point> start_candidates;
 	std::vector<Point> current_track;
-	std::vector<Point> tail;
-	std::queue<Point> to_add_to_base;
-	std::queue<double> to_add_to_base_distance;
+	std::vector<PointInfo> bounding_tail;
+	std::queue<PointInfo> bounding_head;
 
 private:
-	void addPointAndTakeIntersections(const Point&);
-	void goAlongTrack(const Point& start, double direction);
+	void AddToBaseAndCandidates(const Point& point, const Vector& direction);
+	void goAlongTrack(const Point& start, double speed_sign);
 	void addTrack(const Point& start);
 
 public:

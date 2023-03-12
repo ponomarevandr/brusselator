@@ -104,12 +104,6 @@ Vector operator*(double coefficient, const Vector& vector) {
 	return result;
 }
 
-Vector operator/(double coefficient, const Vector& vector) {
-	Vector result = vector;
-	result /= coefficient;
-	return result;
-}
-
 double crossProduct(const Vector& first, const Vector& second) {
 	return first.x * second.y - first.y * second.x;
 }

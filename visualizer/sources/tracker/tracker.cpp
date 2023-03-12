@@ -10,83 +10,77 @@
 const double Tracker::bounding_step_ratio = 0.3;
 const double Tracker::chasing_ratio = 2.0;
 
+Tracker::PointInfo::PointInfo(const Point& point, const Vector& direction,
+	double distance): point(point), direction(direction), distance(distance) {}
+
 Tracker::Tracker(const VectorField& field, const Frame& zone, double step,
 		double max_between_tracks, double min_between_tracks): field(field), zone(zone),
 		step(step), max_between_tracks(max_between_tracks),
 		min_between_tracks(min_between_tracks),
-		bounding_step(min_between_tracks * bounding_step_ratio),
-		base(BASIC_FRAME, 2.0 * max_between_tracks) {
+		bounding_step(bounding_step_ratio * min_between_tracks),
+		chasing_step(chasing_ratio * min_between_tracks),
+		base(BASIC_FRAME, max_between_tracks) {
 	frameTranslate(this->zone, BASIC_FRAME, this->field);
 }
 
-void Tracker::addPointAndTakeIntersections(const Point& point) {
-	std::vector<Point> neighbours = base.getNeighbours(point, 2.0 * max_between_tracks);
-	Circle circle(point, max_between_tracks);
-	for (const Point& neighbour : neighbours) {
-		Circle other(neighbour, max_between_tracks);
-		std::vector<Point> intersections = intersectionPoints(circle, other);
-		for (const Point& candidate : intersections) {
-			if (BASIC_FRAME.isPointInside(candidate))
-				start_candidates.push(candidate);
-		}
-	}
+void Tracker::AddToBaseAndCandidates(const Point& point, const Vector& direction) {
+	Point left_candidate = point + max_between_tracks * turnedLeft(direction);
+	Point right_candidate = point + max_between_tracks * turnedRight(direction);
+	if (BASIC_FRAME.isPointInside(left_candidate))
+		start_candidates.push(left_candidate);
+	if (BASIC_FRAME.isPointInside(right_candidate))
+		start_candidates.push(right_candidate);
 	base.addPoint(point);
 }
 
-void Tracker::goAlongTrack(const Point& start, double direction) {
+void Tracker::goAlongTrack(const Point& start, double speed_sign) {
 	Point current = start;
-	current_track.push_back(current);
-	if (direction > 0)
-		tail.push_back(current);
 	double travelled_distance = 0;
-	double latest_bounding_distane = 0;
+	double latest_bounding_distance = -2.0 * bounding_step;
 	while (true) {
 		Vector speed = field.value(current);
 		if (speed.length() < EPS)
 			break;
-		current += direction * step * normalized(speed);
+		Vector direction = normalized(speed);
 		current_track.push_back(current);
-		travelled_distance += step;
-		if (!BASIC_FRAME.isPointInside(current))
-			break;
-		if (base.hasNeighbours(current, min_between_tracks))
-			break;
-		if (travelled_distance - latest_bounding_distane >= bounding_step) {
-			latest_bounding_distane = travelled_distance;
-			if (travelled_distance <= chasing_ratio * min_between_tracks) {
-				tail.push_back(current);
+		if (travelled_distance - latest_bounding_distance >= bounding_step) {
+			latest_bounding_distance = travelled_distance;
+			if (travelled_distance <= chasing_step) {
+				bounding_tail.emplace_back(current, direction, travelled_distance);
 			} else {
-				to_add_to_base.push(current);
-				to_add_to_base_distance.push(travelled_distance);
+				bounding_head.emplace(current, direction, travelled_distance);;
 			}
 		}
-		while (!to_add_to_base.empty() && travelled_distance - to_add_to_base_distance.front() >
-				chasing_ratio * min_between_tracks) {
-			addPointAndTakeIntersections(to_add_to_base.front());
-			to_add_to_base.pop();
-			to_add_to_base_distance.pop();
+		while (!bounding_head.empty() && travelled_distance - bounding_head.front().distance >
+				chasing_step) {
+			AddToBaseAndCandidates(bounding_head.front().point, bounding_head.front().direction);
+			bounding_head.pop();
 		}
+		travelled_distance += step;
+		current += speed_sign * step * direction;
+		if (!BASIC_FRAME.isPointInside(current))
+			break;
+		if (base.hasNeighbours(current, min_between_tracks)) // !!!
+			break;
 	}
-	while (!to_add_to_base.empty()) {
-		addPointAndTakeIntersections(to_add_to_base.front());
-		to_add_to_base.pop();
-		to_add_to_base_distance.pop();
+	while (!bounding_head.empty()) {
+		AddToBaseAndCandidates(bounding_head.front().point, bounding_head.front().direction);
+		bounding_head.pop();
 	}
 }
 
 void Tracker::addTrack(const Point& start) {
 	current_track.clear();
-	tail.clear();
-	to_add_to_base = std::queue<Point>();
-	to_add_to_base_distance = std::queue<double>();
+	bounding_tail.clear();
+	bounding_head = std::queue<PointInfo>();
 	goAlongTrack(start, -1);
 	std::reverse(current_track.begin(), current_track.end());
 	goAlongTrack(start, 1);
 	tracks.push_back(std::move(current_track));
-	for (const Point& point : tail) {
-		addPointAndTakeIntersections(point);
+	for (PointInfo& info : bounding_tail) {
+		AddToBaseAndCandidates(info.point, info.direction);
 	}
-	tail.clear();
+	bounding_tail.clear();
 }
 
 std::vector<SegmentedLine> Tracker::getTracks() {
