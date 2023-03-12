@@ -30,7 +30,7 @@ private:
 	double max_between_tracks;
 	double min_between_tracks;
 	double bounding_step;
-	double chasing_step;
+	double chasing_distance;
 	std::vector<SegmentedLine> tracks;
 	NeighboursBase max_distance_base;
 	NeighboursBase min_distance_base;
@@ -49,8 +49,8 @@ private:
 	void addGridOfCandidates();
 
 public:
-	Tracker(const VectorField& field, const Frame& zone, double step = 0.001,
-		double max_between_tracks = 0.05, double min_between_tracks = 0.025);
+	Tracker(const VectorField& field, const Frame& zone, double step = 0.0005,
+		double max_between_tracks = 0.04, double min_between_tracks = 0.02);
 	std::vector<SegmentedLine> getTracks();
 	void printReport(std::ostream&);
 };

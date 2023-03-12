@@ -8,7 +8,7 @@
 #include <random>
 
 
-const double Tracker::bounding_step_ratio = 0.3;
+const double Tracker::bounding_step_ratio = 0.2;
 const double Tracker::chasing_ratio = 2.0;
 
 Tracker::PointInfo::PointInfo(const Point& point, const Vector& direction,
@@ -19,7 +19,7 @@ Tracker::Tracker(const VectorField& field, const Frame& zone, double step,
 		step(step), max_between_tracks(max_between_tracks),
 		min_between_tracks(min_between_tracks),
 		bounding_step(bounding_step_ratio * min_between_tracks),
-		chasing_step(chasing_ratio * min_between_tracks),
+		chasing_distance(chasing_ratio * min_between_tracks),
 		max_distance_base(BASIC_FRAME, max_between_tracks),
 		min_distance_base(BASIC_FRAME, min_between_tracks) {
 	frameTranslate(this->zone, BASIC_FRAME, this->field);
@@ -49,14 +49,14 @@ void Tracker::goAlongTrack(const Point& start, double speed_sign) {
 		++points_generated;
 		if (travelled_distance - latest_bounding_distance >= bounding_step) {
 			latest_bounding_distance = travelled_distance;
-			if (travelled_distance <= chasing_step) {
+			if (travelled_distance <= chasing_distance) {
 				bounding_tail.emplace_back(current, direction, travelled_distance);
 			} else {
-				bounding_head.emplace(current, direction, travelled_distance);;
+				bounding_head.emplace(current, direction, travelled_distance);
 			}
 		}
 		while (!bounding_head.empty() && travelled_distance - bounding_head.front().distance >
-				chasing_step) {
+				chasing_distance) {
 			AddToBaseAndCandidates(bounding_head.front().point, bounding_head.front().direction);
 			bounding_head.pop();
 		}
@@ -64,8 +64,10 @@ void Tracker::goAlongTrack(const Point& start, double speed_sign) {
 		current += speed_sign * step * direction;
 		if (!BASIC_FRAME.isPointInside(current))
 			break;
-		if (min_distance_base.hasNeighbours(current, min_between_tracks)) // !!!
-			break;
+		if (travelled_distance - latest_bounding_distance >= bounding_step) {
+			if (min_distance_base.hasNeighbours(current, min_between_tracks))
+				break;
+		}
 	}
 	while (!bounding_head.empty()) {
 		AddToBaseAndCandidates(bounding_head.front().point, bounding_head.front().direction);
