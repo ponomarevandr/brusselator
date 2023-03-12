@@ -83,13 +83,26 @@ void Tracker::addTrack(const Point& start) {
 	bounding_tail.clear();
 }
 
+void Tracker::addGridOfCandidates() {
+	size_t size = std::floor(std::max(10.0, 1.0 / max_between_tracks - 1.0));
+	for (size_t i = 0; i < size; ++i) {
+		for (size_t j = 0; j < size; ++j) {
+			start_candidates.emplace(max_between_tracks * (i + 1), max_between_tracks * (j + 1));
+		}
+	}
+}
+
 std::vector<SegmentedLine> Tracker::getTracks() {
 	tracks.clear();
 	base.clear();
 	start_candidates = std::queue<Point>();
-	start_candidates.push(Point(0.5, 0.5));
-	start_candidates.push(Point(0.5 + max_between_tracks, 0.5));
-	while (!start_candidates.empty()) {
+	start_candidates.emplace(0.5, 0.5);
+	bool is_grid_tried = false;
+	while (!start_candidates.empty() || !is_grid_tried) {
+		if (start_candidates.empty()) {
+			is_grid_tried = true;
+			addGridOfCandidates();
+		}
 		Point candidate = start_candidates.front();
 		start_candidates.pop();
 		if (!base.hasNeighbours(candidate, max_between_tracks - EPS))

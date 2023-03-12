@@ -41,6 +41,7 @@ private:
 	void AddToBaseAndCandidates(const Point& point, const Vector& direction);
 	void goAlongTrack(const Point& start, double speed_sign);
 	void addTrack(const Point& start);
+	void addGridOfCandidates();
 
 public:
 	Tracker(const VectorField& field, const Frame& zone, double step = 0.001,
