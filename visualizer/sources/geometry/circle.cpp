@@ -6,13 +6,13 @@
 Circle::Circle(const Point& center, double r): center(center), r(r) {}
 
 bool Circle::isPointInside(const Point& point) const {
-	return distance(center, point) <= r;
+	return distanceBetweenSquared(center, point) <= r * r;
 }
 
 
 std::vector<Point> intersectionPoints(const Circle& first, const Circle& second) {
 	std::vector<Point> result;
-	double between = distance(first.center, second.center);
+	double between = distanceBetween(first.center, second.center);
 	double cos = (first.r / between + between / first.r -
 		second.r * second.r / first.r / between) * 0.5;
 	if (std::abs(cos) >= 1 + EPS)

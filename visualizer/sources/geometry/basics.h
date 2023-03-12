@@ -51,7 +51,8 @@ Vector turnedLeft(const Vector&);
 Vector operator-(const Vector&);
 Vector turnedRight(const Vector&);
 Vector turned(const Vector&, double);
-double distance(const Point&, const Point&);
+double distanceBetweenSquared(const Point&, const Point&);
+double distanceBetween(const Point&, const Point&);
 Vector normalized(const Vector&);
 
 double degreesToRadians(double);
