@@ -32,7 +32,8 @@ private:
 	double bounding_step;
 	double chasing_step;
 	std::vector<SegmentedLine> tracks;
-	NeighboursBase base;
+	NeighboursBase max_distance_base;
+	NeighboursBase min_distance_base;
 	std::queue<Point> start_candidates;
 	std::vector<Point> current_track;
 	std::vector<PointInfo> bounding_tail;

@@ -20,7 +20,8 @@ Tracker::Tracker(const VectorField& field, const Frame& zone, double step,
 		min_between_tracks(min_between_tracks),
 		bounding_step(bounding_step_ratio * min_between_tracks),
 		chasing_step(chasing_ratio * min_between_tracks),
-		base(BASIC_FRAME, max_between_tracks) {
+		max_distance_base(BASIC_FRAME, max_between_tracks),
+		min_distance_base(BASIC_FRAME, min_between_tracks) {
 	frameTranslate(this->zone, BASIC_FRAME, this->field);
 }
 
@@ -31,7 +32,8 @@ void Tracker::AddToBaseAndCandidates(const Point& point, const Vector& direction
 		start_candidates.push(left_candidate);
 	if (BASIC_FRAME.isPointInside(right_candidate))
 		start_candidates.push(right_candidate);
-	base.addPoint(point);
+	max_distance_base.addPoint(point);
+	min_distance_base.addPoint(point);
 }
 
 void Tracker::goAlongTrack(const Point& start, double speed_sign) {
@@ -62,7 +64,7 @@ void Tracker::goAlongTrack(const Point& start, double speed_sign) {
 		current += speed_sign * step * direction;
 		if (!BASIC_FRAME.isPointInside(current))
 			break;
-		if (base.hasNeighbours(current, min_between_tracks)) // !!!
+		if (min_distance_base.hasNeighbours(current, min_between_tracks)) // !!!
 			break;
 	}
 	while (!bounding_head.empty()) {
@@ -97,7 +99,8 @@ void Tracker::addGridOfCandidates() {
 
 std::vector<SegmentedLine> Tracker::getTracks() {
 	tracks.clear();
-	base.clear();
+	max_distance_base.clear();
+	min_distance_base.clear();
 	tracks_generated = points_generated = 0;
 	auto time_start = std::chrono::steady_clock::now();
 	start_candidates = std::queue<Point>();
@@ -110,7 +113,7 @@ std::vector<SegmentedLine> Tracker::getTracks() {
 		}
 		Point candidate = start_candidates.front();
 		start_candidates.pop();
-		if (!base.hasNeighbours(candidate, max_between_tracks - EPS))
+		if (!max_distance_base.hasNeighbours(candidate, max_between_tracks - EPS))
 			addTrack(candidate);
 	}
 	frameTranslate(BASIC_FRAME, zone, tracks);
