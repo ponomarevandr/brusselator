@@ -4,7 +4,6 @@
 
 #include <string>
 #include <memory>
-#include <functional>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>

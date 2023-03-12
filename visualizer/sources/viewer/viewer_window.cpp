@@ -6,6 +6,7 @@
 #include "tracker/tracker.h"
 #include "tracker/visual_preparator.h"
 
+#include <iostream>
 #include <cstdlib>
 #include <cmath>
 #include <algorithm>
@@ -50,6 +51,7 @@ void ViewerWindow::redrawImage() {
 	Frame frame(Point(0.0, 0.5), Point(4.0, 5.0));
 	Tracker tracker(field, frame);
 	std::vector<SegmentedLine> tracks = tracker.getTracks();
+	tracker.printReport(std::cout);
 	VisualPreparator preparator(tracks, frame, true);
 	preparator.prepareTracks();
 	tracks.emplace_back();

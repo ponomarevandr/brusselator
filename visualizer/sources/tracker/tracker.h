@@ -5,6 +5,7 @@
 #include "geometry/frame.h"
 #include "tracker/neighbours_base.h"
 
+#include <iostream>
 #include <vector>
 #include <queue>
 
@@ -36,6 +37,9 @@ private:
 	std::vector<Point> current_track;
 	std::vector<PointInfo> bounding_tail;
 	std::queue<PointInfo> bounding_head;
+	size_t millis_elapsed;
+	size_t tracks_generated;
+	size_t points_generated;
 
 private:
 	void AddToBaseAndCandidates(const Point& point, const Vector& direction);
@@ -47,4 +51,5 @@ public:
 	Tracker(const VectorField& field, const Frame& zone, double step = 0.001,
 		double max_between_tracks = 0.05, double min_between_tracks = 0.025);
 	std::vector<SegmentedLine> getTracks();
+	void printReport(std::ostream&);
 };

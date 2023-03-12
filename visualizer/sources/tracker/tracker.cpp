@@ -2,6 +2,7 @@
 
 #include "geometry/circle.h"
 
+#include <chrono>
 #include <cmath>
 #include <algorithm>
 #include <random>
@@ -43,6 +44,7 @@ void Tracker::goAlongTrack(const Point& start, double speed_sign) {
 			break;
 		Vector direction = normalized(speed);
 		current_track.push_back(current);
+		++points_generated;
 		if (travelled_distance - latest_bounding_distance >= bounding_step) {
 			latest_bounding_distance = travelled_distance;
 			if (travelled_distance <= chasing_step) {
@@ -77,6 +79,7 @@ void Tracker::addTrack(const Point& start) {
 	std::reverse(current_track.begin(), current_track.end());
 	goAlongTrack(start, 1);
 	tracks.push_back(std::move(current_track));
+	++tracks_generated;
 	for (PointInfo& info : bounding_tail) {
 		AddToBaseAndCandidates(info.point, info.direction);
 	}
@@ -95,6 +98,8 @@ void Tracker::addGridOfCandidates() {
 std::vector<SegmentedLine> Tracker::getTracks() {
 	tracks.clear();
 	base.clear();
+	tracks_generated = points_generated = 0;
+	auto time_start = std::chrono::steady_clock::now();
 	start_candidates = std::queue<Point>();
 	start_candidates.emplace(0.5, 0.5);
 	bool is_grid_tried = false;
@@ -109,5 +114,14 @@ std::vector<SegmentedLine> Tracker::getTracks() {
 			addTrack(candidate);
 	}
 	frameTranslate(BASIC_FRAME, zone, tracks);
+	auto time_finish = std::chrono::steady_clock::now();
+	millis_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(time_finish -
+		time_start).count();
 	return std::move(tracks);
+}
+
+void Tracker::printReport(std::ostream& out) {
+	out << "Tracks: " << tracks_generated << "\n";
+	out << "Points: " << points_generated << "\n";
+	out << "Time elapsed: " << millis_elapsed << "ms\n";
 }
