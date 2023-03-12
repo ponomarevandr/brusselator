@@ -7,17 +7,16 @@
 #include <random>
 
 
-const Frame Tracker::basic = Frame(1, 1);
 const double Tracker::bounding_step_ratio = 0.3;
 const double Tracker::chasing_ratio = 2.0;
 
-Tracker::Tracker(const VectorField& field, const Frame& zone, double step, double plot_step,
+Tracker::Tracker(const VectorField& field, const Frame& zone, double step,
 		double max_between_tracks, double min_between_tracks): field(field), zone(zone),
-		step(step), plot_step(plot_step), max_between_tracks(max_between_tracks),
+		step(step), max_between_tracks(max_between_tracks),
 		min_between_tracks(min_between_tracks),
 		bounding_step(min_between_tracks * bounding_step_ratio),
-		base(basic, 2.0 * max_between_tracks) {
-	frameTranslate(this->zone, basic, this->field);
+		base(BASIC_FRAME, 2.0 * max_between_tracks) {
+	frameTranslate(this->zone, BASIC_FRAME, this->field);
 }
 
 void Tracker::addPointAndTakeIntersections(const Point& point) {
@@ -27,13 +26,12 @@ void Tracker::addPointAndTakeIntersections(const Point& point) {
 		Circle other(neighbour, max_between_tracks);
 		std::vector<Point> intersections = intersectionPoints(circle, other);
 		for (const Point& candidate : intersections) {
-			if (basic.isPointInside(candidate))
+			if (BASIC_FRAME.isPointInside(candidate))
 				start_candidates.push(candidate);
 		}
 	}
 	base.addPoint(point);
 }
-
 
 void Tracker::goAlongTrack(const Point& start, double direction) {
 	Point current = start;
@@ -41,22 +39,18 @@ void Tracker::goAlongTrack(const Point& start, double direction) {
 	if (direction > 0)
 		tail.push_back(current);
 	double travelled_distance = 0;
-	double latest_plot_distance = 0;
 	double latest_bounding_distane = 0;
 	while (true) {
 		Vector speed = field.value(current);
 		if (speed.length() < EPS)
 			break;
 		current += direction * step * normalized(speed);
+		current_track.push_back(current);
 		travelled_distance += step;
-		if (!basic.isPointInside(current))
+		if (!BASIC_FRAME.isPointInside(current))
 			break;
 		if (base.hasNeighbours(current, min_between_tracks))
 			break;
-		if (travelled_distance - latest_plot_distance >= plot_step) {
-			latest_plot_distance = travelled_distance;
-			current_track.push_back(current);
-		}
 		if (travelled_distance - latest_bounding_distane >= bounding_step) {
 			latest_bounding_distane = travelled_distance;
 			if (travelled_distance <= chasing_ratio * min_between_tracks) {
@@ -107,6 +101,6 @@ std::vector<SegmentedLine> Tracker::getTracks() {
 		if (!base.hasNeighbours(candidate, max_between_tracks - EPS))
 			addTrack(candidate);
 	}
-	frameTranslate(basic, zone, tracks);
+	frameTranslate(BASIC_FRAME, zone, tracks);
 	return std::move(tracks);
 }

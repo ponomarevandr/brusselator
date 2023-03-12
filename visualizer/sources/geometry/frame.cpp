@@ -1,6 +1,9 @@
 #include "frame.h"
 
 
+const Frame BASIC_FRAME = Frame(1, 1);
+
+
 Frame::Frame(const Point& bottom_left, const Point& top_right):
 	bottom_left(bottom_left), top_right(top_right) {}
 

@@ -23,6 +23,8 @@ public:
 	bool isPointInside(const Point&) const;
 };
 
+extern const Frame BASIC_FRAME;
+
 void frameTranslate(const Frame& source, const Frame& target, Point& point);
 void frameTranslate(const Frame& source, const Frame& target, std::vector<SegmentedLine>& lines);
 void frameTranslate(const Frame& source, const Frame& target, VectorField& field);

@@ -4,6 +4,7 @@
 #include "geometry/vector_field.h"
 #include "geometry/frame.h"
 #include "tracker/tracker.h"
+#include "tracker/visual_preparator.h"
 
 #include <cstdlib>
 #include <cmath>
@@ -49,6 +50,8 @@ void ViewerWindow::redrawImage() {
 	Frame frame(Point(0.0, 0.5), Point(4.0, 5.0));
 	Tracker tracker(field, frame);
 	std::vector<SegmentedLine> tracks = tracker.getTracks();
+	VisualPreparator preparator(tracks, frame, true);
+	preparator.prepareTracks();
 	tracks.emplace_back();
 	tracks.back().push_back(frame.getBottomLeft());
 	tracks.back().push_back(frame.getBottomLeft() + Vector(0, frame.height()));
