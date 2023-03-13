@@ -53,11 +53,15 @@ Image plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines)
 	auto canvas = std::make_unique<TCanvas>("canvas", "graph", 0, 0, width, height);
 	canvas->SetGrid();
 	auto multigraph = std::make_unique<TMultiGraph>();
-	for (const SegmentedLine& line : lines) {
-		std::vector<double> xs = segmentedLineXs(line);
-		std::vector<double> ys = segmentedLineYs(line);
-		TGraph* graph = new TGraph(line.size(), xs.data(), ys.data());
-		graph->SetLineColor(kRed);
+	for (size_t i = 0; i < lines.size(); ++i) {
+		std::vector<double> xs = segmentedLineXs(lines[i]);
+		std::vector<double> ys = segmentedLineYs(lines[i]);
+		TGraph* graph = new TGraph(lines[i].size(), xs.data(), ys.data());
+		if (i == lines.size() - 1) {
+			graph->SetLineColor(kBlue);
+		} else {
+			graph->SetLineColor(kRed);
+		}
 		graph->SetLineWidth(2);
 		multigraph->Add(graph);
 	}

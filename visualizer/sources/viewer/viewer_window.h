@@ -1,5 +1,7 @@
 #pragma once
 
+#include "geometry/basics.h"
+#include "geometry/frame.h"
 #include "plotter/plotter.h"
 
 #include <string>
@@ -19,10 +21,15 @@ private:
 	std::unique_ptr<Fl_Box> graph_box;
 	std::unique_ptr<Fl_Button> redraw_button;
 	std::unique_ptr<Fl_Button> save_button;
+	Point zone_center;
+	Vector zone_to_corner;
+	std::vector<SegmentedLine> tracks;
 
 private:
 	static void redrawButtonCallback(Fl_Widget* widget, void* ptr);
 	static void saveButtonCallback(Fl_Widget* widget, void* ptr);
+	int handle(int event) override;
+	void rebuildTracks();
 
 public:
 	ViewerWindow();
