@@ -22,8 +22,8 @@ private:
 	};
 
 private:
-	static const double bounding_step_ratio;
-	static const double chasing_ratio;
+	static const double BOUNDING_STEP_RATIO;
+	static const double CHASING_RATIO;
 	VectorField field;
 	Frame zone;
 	double step;

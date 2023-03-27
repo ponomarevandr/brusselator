@@ -8,8 +8,8 @@
 #include <random>
 
 
-const double Tracker::bounding_step_ratio = 0.2;
-const double Tracker::chasing_ratio = 2.0;
+const double Tracker::BOUNDING_STEP_RATIO = 0.2;
+const double Tracker::CHASING_RATIO = 2.0;
 
 Tracker::PointInfo::PointInfo(const Point& point, const Vector& direction,
 	double distance): point(point), direction(direction), distance(distance) {}
@@ -18,8 +18,8 @@ Tracker::Tracker(const VectorField& field, const Frame& zone, double step,
 		double max_between_tracks, double min_between_tracks): field(field), zone(zone),
 		step(step), max_between_tracks(max_between_tracks),
 		min_between_tracks(min_between_tracks),
-		bounding_step(bounding_step_ratio * min_between_tracks),
-		chasing_distance(chasing_ratio * min_between_tracks),
+		bounding_step(BOUNDING_STEP_RATIO * min_between_tracks),
+		chasing_distance(CHASING_RATIO * min_between_tracks),
 		max_distance_base(BASIC_FRAME, max_between_tracks),
 		min_distance_base(BASIC_FRAME, min_between_tracks) {
 	frameTranslate(this->zone, BASIC_FRAME, this->field);
