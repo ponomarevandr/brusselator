@@ -61,17 +61,6 @@ int ViewerWindow::handle(int event) {
 	return Fl_Double_Window::handle(event);
 }
 
-double v_a = 1.0;
-double v_b = 3.0;
-
-double vx(double x, double y) {
-	return v_a - (v_b + 1.0) * x + x * x * y;
-}
-
-double vy(double x, double y) {
-	return v_b * x - x * x * y;
-}
-
 void ViewerWindow::rebuildTracks() {
 	FormulaXY dx_dt(x_formula_input->value());
 	FormulaXY dy_dt(y_formula_input->value());

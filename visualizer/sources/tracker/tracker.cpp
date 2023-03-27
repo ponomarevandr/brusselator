@@ -82,12 +82,13 @@ void Tracker::addTrack(const Point& start) {
 	goAlongTrack(start, -1);
 	std::reverse(current_track.begin(), current_track.end());
 	goAlongTrack(start, 1);
-	tracks.push_back(std::move(current_track));
-	++tracks_generated;
+	if (!current_track.empty()) {
+		tracks.push_back(std::move(current_track));
+		++tracks_generated;
+	}
 	for (PointInfo& info : bounding_tail) {
 		AddToBaseAndCandidates(info.point, info.direction);
 	}
-	bounding_tail.clear();
 }
 
 void Tracker::addGridOfCandidates() {
