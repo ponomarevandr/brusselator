@@ -3,6 +3,7 @@
 #include "geometry/vector_field.h"
 #include "tracker/tracker.h"
 #include "tracker/visual_preparator.h"
+#include "formula/formula_xy.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -60,7 +61,7 @@ int ViewerWindow::handle(int event) {
 	return Fl_Double_Window::handle(event);
 }
 
-double v_a = 3.0;
+double v_a = 1.0;
 double v_b = 3.0;
 
 double vx(double x, double y) {
@@ -73,10 +74,14 @@ double vy(double x, double y) {
 
 void ViewerWindow::rebuildTracks() {
 	Frame working_zone(zone_center - zone_to_corner, zone_center + zone_to_corner);
-	VectorField field(vx, vy);
+
+	FormulaXY fx("1.0 - 4.0 * x + x * x * y");
+	FormulaXY fy("3.0 * x - x * x * y");
+
+	VectorField field(fx, fy);
 	Tracker tracker(field, working_zone);
 	tracks = tracker.getTracks();
-	//tracker.printReport(std::cout);
+	tracker.printReport(std::cout);
 	VisualPreparator preparator(tracks, working_zone, true);
 	preparator.prepareTracks();
 }
