@@ -1,47 +1,83 @@
 #include "formula_xy.h"
 
+#include <cstdlib>
+#include <matheval.h>
 
-const double FormulaXY::START_DARG = 1.0;
-const double FormulaXY::STEP_DARG = 0.01;
-const size_t FormulaXY::MAX_STEPS = 4;
 
-double FormulaXY::getDerivative(double x, std::function<double(double)> f) {
-	double fx = f(x);
-	double dx = START_DARG;
-	double result = 0.0;
-	for (size_t i = 0; i < MAX_STEPS; ++i) {
-		double current = (f(x + dx) - fx) / dx;
-		if (result != 0.0 && current == 0.0)
-			break;
-		result = current;
-		dx *= STEP_DARG;
-	}
-	return result;
+FormulaXY::FormulaXY(void* evaluator): evaluator(evaluator) {
+	symbols = std::string(evaluator_get_string(evaluator));
 }
 
 FormulaXY::FormulaXY(const std::string& symbols): symbols(symbols),
-	implementation("", symbols.c_str()) {}
+	evaluator(evaluator_create(const_cast<char*>(symbols.c_str()))) {}
+
+FormulaXY::~FormulaXY() {
+	if (evaluator)
+		evaluator_destroy(evaluator);
+}
+
+FormulaXY::FormulaXY(const FormulaXY& other): symbols(other.symbols),
+	evaluator(evaluator_create(const_cast<char*>(other.symbols.c_str()))) {}
+
+FormulaXY::FormulaXY(FormulaXY&& other): symbols(std::move(other.symbols)),
+		evaluator(other.evaluator) {
+	other.symbols.clear();
+	other.evaluator = nullptr;
+}
+
+FormulaXY& FormulaXY::operator=(const FormulaXY& other) {
+	symbols = other.symbols;
+	evaluator = evaluator_create(const_cast<char*>(other.symbols.c_str()));
+	return *this;
+}
+
+FormulaXY& FormulaXY::operator=(FormulaXY&& other) {
+	symbols = std::move(other.symbols);
+	evaluator = other.evaluator;
+	other.symbols.clear();
+	other.evaluator = nullptr;
+	return *this;
+}
 
 bool FormulaXY::isValid() const {
-	return implementation.IsValid();
+	if (!evaluator)
+		return false;
+	char** variables_names;
+	int variables_count;
+	evaluator_get_variables(evaluator, &variables_names, &variables_count);
+	for (int i = 0; i < variables_count; ++i) {
+		std::string name(variables_names[i]);
+		if (name != "x" && name != "y")
+			return false;
+	}
+	return true;
 }
 
 double FormulaXY::operator()(double x, double y) const {
-	return implementation.Eval(x, y);
+	return evaluator_evaluate_x_y(evaluator, x, y);
 }
 
 std::string FormulaXY::getSymbols() const {
 	return symbols;
 }
 
-double FormulaXY::derivativeX(double x, double y) const {
-	return getDerivative(x, [this, y](double x) -> double {
-		return this->implementation.Eval(x, y);
-	});
+
+FormulaXY derivativeX(const FormulaXY& function) {
+	void* evaluator = evaluator_derivative_x(function.evaluator);
+	return FormulaXY(evaluator);
 }
 
-double FormulaXY::derivativeY(double x, double y) const {
-	return getDerivative(y, [this, x](double y) -> double {
-		return this->implementation.Eval(x, y);
-	});
+FormulaXY derivativeY(const FormulaXY& function) {
+	void* evaluator = evaluator_derivative_y(function.evaluator);
+	return FormulaXY(evaluator);
+}
+
+FormulaXY divergency(const FormulaXY& function) {
+	void* evaluator_x = evaluator_derivative_x(function.evaluator);
+	void* evaluator_y = evaluator_derivative_y(function.evaluator);
+	std::string symbols_derivative_x = std::string(evaluator_get_string(evaluator_x));
+	std::string symbols_derivative_y = std::string(evaluator_get_string(evaluator_y));
+	evaluator_destroy(evaluator_x);
+	evaluator_destroy(evaluator_y);
+	return FormulaXY(symbols_derivative_x + " + " + symbols_derivative_y);
 }

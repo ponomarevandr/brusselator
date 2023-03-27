@@ -32,4 +32,4 @@ include_directories(sources)
 
 add_executable(visualizer sources/main.cpp ${SOURCES})
 # ${ROOT_LIBRARIES} can be used
-target_link_libraries(visualizer Core Hist Graf Gpad MathCore fltk fltk_images)
+target_link_libraries(visualizer Core Hist Graf Gpad fltk fltk_images matheval)

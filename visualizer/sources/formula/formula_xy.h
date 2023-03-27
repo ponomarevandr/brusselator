@@ -3,26 +3,33 @@
 #include <string>
 #include <functional>
 
-#include "TFormula.h"
-
 
 class FormulaXY {
-private:
-	static const double START_DARG;
-	static const double STEP_DARG;
-	static const size_t MAX_STEPS;
-	std::string symbols;
-	TFormula implementation;
+	friend FormulaXY derivativeX(const FormulaXY&);
+	friend FormulaXY derivativeY(const FormulaXY&);
+	friend FormulaXY divergency(const FormulaXY&);
 
 private:
-	static double getDerivative(double x, std::function<double(double)> f);
+	std::string symbols;
+	void* evaluator = nullptr;
+
+private:
+	FormulaXY(void* evaluator);
 
 public:
 	FormulaXY() = default;
-	FormulaXY(const std::string& symbols);
+	explicit FormulaXY(const std::string& symbols);
+	~FormulaXY();
+	FormulaXY(const FormulaXY&);
+	FormulaXY(FormulaXY&&);
+	FormulaXY& operator=(const FormulaXY&);
+	FormulaXY& operator=(FormulaXY&&);
+
 	bool isValid() const;
 	double operator()(double x, double y) const;
 	std::string getSymbols() const;
-	double derivativeX(double x, double y) const;
-	double derivativeY(double x, double y) const;
 };
+
+FormulaXY derivativeX(const FormulaXY&);
+FormulaXY derivativeY(const FormulaXY&);
+FormulaXY divergency(const FormulaXY&);
