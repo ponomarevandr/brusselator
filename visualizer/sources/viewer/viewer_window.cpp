@@ -73,12 +73,14 @@ double vy(double x, double y) {
 }
 
 void ViewerWindow::rebuildTracks() {
+	FormulaXY dx_dt(x_formula_input->value());
+	FormulaXY dy_dt(y_formula_input->value());
+	if (!dx_dt.isValid() || !dy_dt.isValid()) {
+		fl_message("Некорректные формулы!");
+		return;
+	}
+	VectorField field(dx_dt, dy_dt);
 	Frame working_zone(zone_center - zone_to_corner, zone_center + zone_to_corner);
-
-	FormulaXY fx("1.0 - 4.0 * x + x * x * y");
-	FormulaXY fy("3.0 * x - x * x * y");
-
-	VectorField field(fx, fy);
 	Tracker tracker(field, working_zone);
 	tracks = tracker.getTracks();
 	tracker.printReport(std::cout);
@@ -88,13 +90,19 @@ void ViewerWindow::rebuildTracks() {
 
 ViewerWindow::ViewerWindow():
 		Fl_Double_Window(1000, 700, "Построитель фазового портрета"),
-		zone_center(1.5, 1.0), zone_to_corner(3.0, 2.0) {
+		zone_center(0.0, 0.0), zone_to_corner(3.0, 2.0) {
 	graph_box = std::make_unique<Fl_Box>(10, 22, 800, 576);
 	graph_box->box(FL_UP_BOX);
+	movement_button = std::make_unique<Fl_Button>(820, 428, 170, 50, "Движение");
 	redraw_button = std::make_unique<Fl_Button>(820, 488, 170, 50, "Перестроить");
 	redraw_button->callback(ViewerWindow::redrawButtonCallback, this);
 	save_button = std::make_unique<Fl_Button>(820, 548, 170, 50, "Сохранить");
 	save_button->callback(ViewerWindow::saveButtonCallback, this);
+	x_equals_label = std::make_unique<Fl_Box>(FL_NO_BOX, 10, 610, 40, 35, "x' =");
+	y_equals_label = std::make_unique<Fl_Box>(FL_NO_BOX, 10, 655, 40, 35, "y' =");
+	x_formula_input = std::make_unique<Fl_Input>(60, 610, 740, 35);
+	y_formula_input = std::make_unique<Fl_Input>(60, 655, 740, 35);
+	redrawImage();
 }
 
 void ViewerWindow::redrawImage() {
