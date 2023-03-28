@@ -102,7 +102,11 @@ void ViewerWindow::redrawImage() {
 	tracks.back().push_back(zone_center + zone_to_corner);
 	tracks.back().push_back(zone_center + to_other_corner);
 	tracks.back().push_back(zone_center - zone_to_corner);
-	graph_image = Plotter::plot(800, 600, tracks);
+
+	Plotter plotter(800, 600);
+	plotter.addPortrait(tracks, Plotter::Color::RED);
+	graph_image = plotter.getImage();
+
 	tracks.pop_back();
 
 	graph_fltk_image = std::make_unique<Fl_PNG_Image>(nullptr,

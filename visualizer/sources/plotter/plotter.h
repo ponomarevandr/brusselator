@@ -7,34 +7,52 @@
 #include <memory>
 
 
-namespace Plotter {
+class Plotter {
+public:
+	enum class Color {
+		RED = 0,
+		YELLOW = 1,
+		GREEN = 2,
+		CYAN = 3,
+		BLUE = 4,
+		MAGENTA = 5,
+		BLACK = 6
+	};
+	
+	class Image {
+	private:
+		void* buffer = nullptr;
+		int size = 0;
 
-class Image {
+	public:
+		Image() = default;
+		Image(void* buffer, int size);
+		Image(const Image&) = delete;
+		Image(Image&&);
+		~Image();
+
+		Image& operator=(const Image&) = delete;
+		Image& operator=(Image&&);
+
+		template<typename ReturnType>
+		ReturnType* getBuffer() const {
+			return reinterpret_cast<ReturnType*>(buffer);
+		}
+
+		int getSize() const;
+		bool isValid() const;
+		void save(const std::string& filename) const;
+	};
+
 private:
-	void* buffer = nullptr;
-	int size = 0;
+	static const int root_color[];
+	size_t image_width;
+	size_t image_height;
+	std::vector<std::vector<SegmentedLine>> portraits;
+	std::vector<Color> colors;
 
 public:
-	Image() = default;
-	Image(void* buffer, int size);
-	Image(const Image&) = delete;
-	Image(Image&&);
-	~Image();
-
-	Image& operator=(const Image&) = delete;
-	Image& operator=(Image&&);
-
-	template<typename ReturnType>
-	ReturnType* getBuffer() const {
-		return reinterpret_cast<ReturnType*>(buffer);
-	}
-
-	int getSize() const;
-	bool isValid() const;
-	void save(const std::string& filename) const;
+	Plotter(size_t image_width, size_t image_height);
+	void addPortrait(const std::vector<SegmentedLine>& tracks, Color color);
+	Image getImage();
 };
-
-
-Image plot(size_t width, size_t height, const std::vector<SegmentedLine>& lines);
-
-}
