@@ -1,14 +1,6 @@
 #include "viewer_window.h"
 
-#include "geometry/vector_field.h"
-#include "tracker/tracker.h"
-#include "tracker/visual_preparator.h"
-#include "formula/formula_xy.h"
-
-#include <iostream>
 #include <cstdlib>
-#include <cmath>
-#include <algorithm>
 
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_File_Chooser.H>
@@ -25,7 +17,7 @@ void ViewerWindow::saveButtonCallback(Fl_Widget* widget, void* ptr) {
 		return;
 	if (!static_cast<ViewerWindow*>(ptr)->saveImage(filename))
 		fl_message("Изображение отсутствует!");
-	free(filename);
+	std::free(filename);
 }
 
 int ViewerWindow::handle(int event) {
@@ -62,19 +54,14 @@ int ViewerWindow::handle(int event) {
 }
 
 void ViewerWindow::rebuildTracks() {
-	FormulaXY dx_dt(x_formula_input->value());
-	FormulaXY dy_dt(y_formula_input->value());
-	if (!dx_dt.isValid() || !dy_dt.isValid()) {
+	carousel.setFormulaSymbols(0, x_formula_input->value());
+	carousel.setFormulaSymbols(1, y_formula_input->value());
+	if (!carousel.isValid()) {
 		fl_message("Некорректные формулы!");
 		return;
 	}
-	VectorField field(dx_dt, dy_dt);
-	Frame working_zone(zone_center - zone_to_corner, zone_center + zone_to_corner);
-	Tracker tracker(field, working_zone);
-	tracks = tracker.getTracks();
-	tracker.printReport(std::cout);
-	VisualPreparator preparator(tracks, working_zone, true);
-	preparator.prepareTracks();
+	portraits = carousel.getPortraits(Frame(zone_center - zone_to_corner,
+		zone_center + zone_to_corner));
 }
 
 ViewerWindow::ViewerWindow():
@@ -95,20 +82,21 @@ ViewerWindow::ViewerWindow():
 }
 
 void ViewerWindow::redrawImage() {
-	tracks.emplace_back();
-	Vector to_other_corner = Vector(zone_to_corner.x, -zone_to_corner.y);
-	tracks.back().push_back(zone_center - zone_to_corner);
-	tracks.back().push_back(zone_center - to_other_corner);
-	tracks.back().push_back(zone_center + zone_to_corner);
-	tracks.back().push_back(zone_center + to_other_corner);
-	tracks.back().push_back(zone_center - zone_to_corner);
-
 	Plotter plotter(800, 600);
-	plotter.addPortrait(tracks, Plotter::Color::RED);
+	for (Carousel::Portrait& portrait : portraits) {
+		plotter.addPortrait(portrait.first, portrait.second);
+	}
+	Vector to_other_corner = Vector(zone_to_corner.x, -zone_to_corner.y);
+	std::vector<SegmentedLine> view_frame(1);
+	view_frame[0] = {
+		zone_center - zone_to_corner,
+		zone_center - to_other_corner,
+		zone_center + zone_to_corner,
+		zone_center + to_other_corner,
+		zone_center - zone_to_corner
+	};
+	plotter.addPortrait(view_frame, Plotter::Color::BLACK);
 	graph_image = plotter.getImage();
-
-	tracks.pop_back();
-
 	graph_fltk_image = std::make_unique<Fl_PNG_Image>(nullptr,
 		graph_image.getBuffer<unsigned char>(), graph_image.getSize());
 	graph_box->image(graph_fltk_image.get());

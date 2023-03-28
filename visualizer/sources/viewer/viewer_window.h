@@ -3,6 +3,7 @@
 #include "geometry/basics.h"
 #include "geometry/frame.h"
 #include "plotter/plotter.h"
+#include "viewer/carousel.h"
 
 #include <string>
 #include <memory>
@@ -28,7 +29,8 @@ private:
 	std::unique_ptr<Fl_Input> y_formula_input;
 	Point zone_center;
 	Vector zone_to_corner;
-	std::vector<SegmentedLine> tracks;
+	std::vector<Carousel::Portrait> portraits;
+	Carousel carousel;
 
 private:
 	static void redrawButtonCallback(Fl_Widget* widget, void* ptr);

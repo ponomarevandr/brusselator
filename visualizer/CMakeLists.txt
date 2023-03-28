@@ -11,6 +11,7 @@ set(SOURCES
 	sources/plotter/plotter.cpp
 	sources/viewer/application.cpp
 	sources/viewer/viewer_window.cpp
+	sources/viewer/carousel.cpp
 	sources/tracker/tracker.cpp
 	sources/tracker/visual_preparator.cpp
 	sources/tracker/neighbours_base.cpp
