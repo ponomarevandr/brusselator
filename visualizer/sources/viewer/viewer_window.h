@@ -5,6 +5,7 @@
 #include "plotter/plotter.h"
 #include "viewer/carousel.h"
 
+#include <vector>
 #include <string>
 #include <memory>
 
@@ -23,10 +24,8 @@ private:
 	std::unique_ptr<Fl_Button> movement_button;
 	std::unique_ptr<Fl_Button> redraw_button;
 	std::unique_ptr<Fl_Button> save_button;
-	std::unique_ptr<Fl_Box> x_equals_label;
-	std::unique_ptr<Fl_Box> y_equals_label;
-	std::unique_ptr<Fl_Input> x_formula_input;
-	std::unique_ptr<Fl_Input> y_formula_input;
+	std::vector<std::unique_ptr<Fl_Box>> formula_labels;
+	std::vector<std::unique_ptr<Fl_Input>> formula_inputs;
 	Point zone_center;
 	Vector zone_to_corner;
 	std::vector<Carousel::Portrait> portraits;

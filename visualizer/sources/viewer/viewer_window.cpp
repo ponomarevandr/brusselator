@@ -54,8 +54,8 @@ int ViewerWindow::handle(int event) {
 }
 
 void ViewerWindow::rebuildTracks() {
-	carousel.setFormulaSymbols(0, x_formula_input->value());
-	carousel.setFormulaSymbols(1, y_formula_input->value());
+	carousel.setFormulaSymbols(0, formula_inputs[0]->value());
+	carousel.setFormulaSymbols(1, formula_inputs[1]->value());
 	if (!carousel.isValid()) {
 		fl_message("Некорректные формулы!");
 		return;
@@ -74,10 +74,12 @@ ViewerWindow::ViewerWindow():
 	redraw_button->callback(ViewerWindow::redrawButtonCallback, this);
 	save_button = std::make_unique<Fl_Button>(820, 548, 170, 50, "Сохранить");
 	save_button->callback(ViewerWindow::saveButtonCallback, this);
-	x_equals_label = std::make_unique<Fl_Box>(FL_NO_BOX, 10, 610, 40, 35, "x' =");
-	y_equals_label = std::make_unique<Fl_Box>(FL_NO_BOX, 10, 655, 40, 35, "y' =");
-	x_formula_input = std::make_unique<Fl_Input>(60, 610, 740, 35);
-	y_formula_input = std::make_unique<Fl_Input>(60, 655, 740, 35);
+	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 10, 605, 40, 25, "x' ="));
+	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 10, 635, 40, 25, "y' ="));
+	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 10, 665, 40, 25, "---"));
+	formula_inputs.push_back(std::make_unique<Fl_Input>(60, 605, 740, 25));
+	formula_inputs.push_back(std::make_unique<Fl_Input>(60, 635, 740, 25));
+	formula_inputs.push_back(std::make_unique<Fl_Input>(60, 665, 740, 25));
 	redrawImage();
 }
 
