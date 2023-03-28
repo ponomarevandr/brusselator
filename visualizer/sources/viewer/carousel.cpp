@@ -16,6 +16,10 @@ bool Carousel::ElementBase::isValid() const {
 	return true;
 }
 
+size_t Carousel::ElementBase::getFormulasNumber() const {
+	return labels.size();
+}
+
 std::vector<std::string> Carousel::ElementBase::getLabels() const {
 	return labels;
 }
@@ -42,8 +46,8 @@ void Carousel::ElementBase::setColor(Plotter::Color color) {
 
 
 Carousel::ElementSystem::ElementSystem(): ElementBase(2) {
-	labels[0] = "x' = ";
-	labels[1] = "y' = ";
+	labels[0] = "x' =";
+	labels[1] = "y' =";
 }
 
 Carousel::Portrait Carousel::ElementSystem::getPortrait(const Frame& zone) const {
@@ -69,7 +73,8 @@ void Carousel::toPrevious() {
 }
 
 void Carousel::addElement() {
-	elements.insert(elements.begin() + index, std::make_unique<ElementSystem>());
+	elements.insert(elements.begin() + index + 1, std::make_unique<ElementSystem>());
+	toNext();
 }
 
 void Carousel::removeElement() {
@@ -89,6 +94,10 @@ bool Carousel::isValid() const {
 
 size_t Carousel::getIndex() const {
 	return index;
+}
+
+size_t Carousel::getFormulasNumber() const {
+	return elements[index]->getFormulasNumber();
 }
 
 std::vector<std::string> Carousel::getLabels() const {

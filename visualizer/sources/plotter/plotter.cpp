@@ -47,7 +47,7 @@ void Plotter::Image::save(const std::string& filename) const {
 }
 
 
-const int Plotter::root_color[7] = {
+const int Plotter::ROOT_COLOR[7] = {
 	kRed, kYellow, kGreen, kCyan, kBlue, kMagenta, kBlack
 };
 
@@ -68,7 +68,7 @@ Plotter::Image Plotter::getImage() {
 			std::vector<double> xs = segmentedLineXs(portraits[i][j]);
 			std::vector<double> ys = segmentedLineYs(portraits[i][j]);
 			TGraph* graph = new TGraph(portraits[i][j].size(), xs.data(), ys.data());
-			graph->SetLineColor(root_color[static_cast<size_t>(colors[i])]);
+			graph->SetLineColor(ROOT_COLOR[static_cast<size_t>(colors[i])]);
 			graph->SetLineWidth(2);
 			multigraph->Add(graph);
 		}

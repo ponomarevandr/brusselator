@@ -45,7 +45,7 @@ public:
 	};
 
 private:
-	static const int root_color[];
+	static const int ROOT_COLOR[7];
 	size_t image_width;
 	size_t image_height;
 	std::vector<std::vector<SegmentedLine>> portraits;

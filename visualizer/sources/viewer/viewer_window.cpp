@@ -6,6 +6,11 @@
 #include <FL/Fl_File_Chooser.H>
 
 
+const int ViewerWindow::FLTK_COLOR[7] = {
+	FL_RED, FL_YELLOW, FL_GREEN, FL_CYAN, FL_BLUE, FL_MAGENTA, FL_BLACK
+};
+
+
 void ViewerWindow::redrawButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->rebuildTracks();
 	static_cast<ViewerWindow*>(ptr)->redrawImage();
@@ -18,6 +23,38 @@ void ViewerWindow::saveButtonCallback(Fl_Widget* widget, void* ptr) {
 	if (!static_cast<ViewerWindow*>(ptr)->saveImage(filename))
 		fl_message("Изображение отсутствует!");
 	std::free(filename);
+}
+
+void ViewerWindow::carouselPreviousButtonCallback(Fl_Widget* widget, void* ptr) {
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
+	static_cast<ViewerWindow*>(ptr)->carousel.toPrevious();
+	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
+}
+
+void ViewerWindow::carouselNextButtonCallback(Fl_Widget* widget, void* ptr) {
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
+	static_cast<ViewerWindow*>(ptr)->carousel.toNext();
+	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
+}
+
+void ViewerWindow::carouselColorButtonCallback(Fl_Widget* widget, void* ptr) {
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
+	Plotter::Color color = static_cast<ViewerWindow*>(ptr)->carousel.getColor();
+	color = static_cast<Plotter::Color>((static_cast<size_t>(color) + 1) % 6);
+	static_cast<ViewerWindow*>(ptr)->carousel.setColor(color);
+	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
+}
+
+void ViewerWindow::carouselAddButtonCallback(Fl_Widget* widget, void* ptr) {
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
+	static_cast<ViewerWindow*>(ptr)->carousel.addElement();
+	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
+}
+
+void ViewerWindow::carouselRemoveButtonCallback(Fl_Widget* widget, void* ptr) {
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
+	static_cast<ViewerWindow*>(ptr)->carousel.removeElement();
+	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
 }
 
 int ViewerWindow::handle(int event) {
@@ -64,6 +101,31 @@ void ViewerWindow::rebuildTracks() {
 		zone_center + zone_to_corner));
 }
 
+void ViewerWindow::saveToCarousel() {
+	for (size_t i = 0; i < carousel.getFormulasNumber(); ++i) {
+		carousel.setFormulaSymbols(i, formula_inputs[i]->value());
+	}
+}
+
+void ViewerWindow::loadFromCarousel() {
+	formula_labels_text = carousel.getLabels();
+	std::vector<std::string> formulas_symbols = carousel.getFormulasSymbols();
+	for (size_t i = 0; i < formulas_symbols.size(); ++i) {
+		formula_labels[i]->label(formula_labels_text[i].c_str());
+		formula_labels[i]->show();
+		formula_inputs[i]->value(formulas_symbols[i].c_str());
+		formula_inputs[i]->show();
+	}
+	for (size_t i = formulas_symbols.size(); i < 3; ++i) {
+		formula_labels[i]->hide();
+		formula_inputs[i]->hide();
+	}
+	carousel_index_text = std::to_string(carousel.getIndex() + 1);
+	carousel_index->label(carousel_index_text.c_str());
+	carousel_color_button->color(FLTK_COLOR[static_cast<size_t>(carousel.getColor())]);
+	carousel_color_button->redraw();
+}
+
 ViewerWindow::ViewerWindow():
 		Fl_Double_Window(1000, 700, "Построитель фазового портрета"),
 		zone_center(0.0, 0.0), zone_to_corner(3.0, 2.0) {
@@ -74,12 +136,25 @@ ViewerWindow::ViewerWindow():
 	redraw_button->callback(ViewerWindow::redrawButtonCallback, this);
 	save_button = std::make_unique<Fl_Button>(820, 548, 170, 50, "Сохранить");
 	save_button->callback(ViewerWindow::saveButtonCallback, this);
-	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 10, 605, 40, 25, "x' ="));
-	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 10, 635, 40, 25, "y' ="));
-	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 10, 665, 40, 25, "---"));
-	formula_inputs.push_back(std::make_unique<Fl_Input>(60, 605, 740, 25));
-	formula_inputs.push_back(std::make_unique<Fl_Input>(60, 635, 740, 25));
-	formula_inputs.push_back(std::make_unique<Fl_Input>(60, 665, 740, 25));
+	carousel_previous_button = std::make_unique<Fl_Button>(10, 605, 30, 50, "<");
+	carousel_previous_button->callback(ViewerWindow::carouselPreviousButtonCallback, this);
+	carousel_index = std::make_unique<Fl_Box>(FL_NO_BOX, 40, 605, 40, 50, "");
+	carousel_next_button = std::make_unique<Fl_Button>(80, 605, 30, 50, ">");
+	carousel_next_button->callback(ViewerWindow::carouselNextButtonCallback, this);
+	carousel_color_button = std::make_unique<Fl_Button>(10, 660, 100, 30, "");
+	carousel_color_button->callback(ViewerWindow::carouselColorButtonCallback, this);
+	formula_labels_text.resize(3);
+	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 605, 40, 25, ""));
+	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 635, 40, 25, ""));
+	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 665, 40, 25, ""));
+	formula_inputs.push_back(std::make_unique<Fl_Input>(170, 605, 640, 25));
+	formula_inputs.push_back(std::make_unique<Fl_Input>(170, 635, 640, 25));
+	formula_inputs.push_back(std::make_unique<Fl_Input>(170, 665, 640, 25));
+	carousel_add_button = std::make_unique<Fl_Button>(820, 605, 170, 40, "Добавить");
+	carousel_add_button->callback(ViewerWindow::carouselAddButtonCallback, this);
+	carousel_remove_button = std::make_unique<Fl_Button>(820, 650, 170, 40, "Удалить");
+	carousel_remove_button->callback(ViewerWindow::carouselRemoveButtonCallback, this);
+	loadFromCarousel();
 	redrawImage();
 }
 

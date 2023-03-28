@@ -25,6 +25,7 @@ private:
 		ElementBase(size_t formulas_number);
 		virtual Portrait getPortrait(const Frame& zone) const = 0;
 		bool isValid() const;
+		size_t getFormulasNumber() const;
 		std::vector<std::string> getLabels() const;
 		std::vector<std::string> getFormulasSymbols() const;
 		void setFormulaSymbols(size_t index, const std::string& symbols);
@@ -50,6 +51,7 @@ public:
 	void removeElement();
 	bool isValid() const;
 	size_t getIndex() const;
+	size_t getFormulasNumber() const;
 	std::vector<std::string> getLabels() const;
 	std::vector<std::string> getFormulasSymbols() const;
 	void setFormulaSymbols(size_t index_in_element, const std::string& symbols);
