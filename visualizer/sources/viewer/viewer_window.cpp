@@ -95,23 +95,21 @@ void ViewerWindow::rebuildTracks() {
 
 void ViewerWindow::saveToCarousel() {
 	for (size_t i = 0; i < carousel.getFormulasNumber(); ++i) {
-		carousel.setFormulaSymbols(i, formula_inputs[i]->value());
+		carousel.setFormulaSymbols(i, formula_inputs[i].getValue());
 	}
 	carousel.setColor(carousel_color_input.getColor());
 }
 
 void ViewerWindow::loadFromCarousel() {
-	formula_labels_text = carousel.getLabels();
-	std::vector<std::string> formulas_symbols = carousel.getFormulasSymbols();
-	for (size_t i = 0; i < formulas_symbols.size(); ++i) {
-		formula_labels[i]->label(formula_labels_text[i].c_str());
-		formula_labels[i]->show();
-		formula_inputs[i]->value(formulas_symbols[i].c_str());
-		formula_inputs[i]->show();
+	std::vector<std::string> labels = carousel.getLabels();
+	std::vector<std::string> symbols = carousel.getFormulasSymbols();
+	for (size_t i = 0; i < labels.size(); ++i) {
+		formula_inputs[i].setLabel(labels[i]);
+		formula_inputs[i].setValue(symbols[i]);
+		formula_inputs[i].show();
 	}
-	for (size_t i = formulas_symbols.size(); i < 3; ++i) {
-		formula_labels[i]->hide();
-		formula_inputs[i]->hide();
+	for (size_t i = labels.size(); i < 3; ++i) {
+		formula_inputs[i].hide();
 	}
 	carousel_index_text = std::to_string(carousel.getIndex() + 1);
 	carousel_index->label(carousel_index_text.c_str());
@@ -140,13 +138,9 @@ ViewerWindow::ViewerWindow():
 	carousel_next_button = std::make_unique<Fl_Button>(80, 605, 30, 50, ">");
 	carousel_next_button->callback(ViewerWindow::carouselNextButtonCallback, this);
 	carousel_color_input = ColorInput(10, 660, 100, 30, "");
-	formula_labels_text.resize(3);
-	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 605, 40, 25, ""));
-	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 635, 40, 25, ""));
-	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 665, 40, 25, ""));
-	formula_inputs.push_back(std::make_unique<Fl_Input>(170, 605, 640, 25));
-	formula_inputs.push_back(std::make_unique<Fl_Input>(170, 635, 640, 25));
-	formula_inputs.push_back(std::make_unique<Fl_Input>(170, 665, 640, 25));
+	formula_inputs.emplace_back(125, 605, 685, 25, 45);
+	formula_inputs.emplace_back(125, 635, 685, 25, 45);
+	formula_inputs.emplace_back(125, 665, 685, 25, 45);
 	carousel_add_button = std::make_unique<Fl_Button>(820, 605, 170, 40, "Добавить");
 	carousel_add_button->callback(ViewerWindow::carouselAddButtonCallback, this);
 	carousel_remove_button = std::make_unique<Fl_Button>(820, 650, 170, 40, "Удалить");

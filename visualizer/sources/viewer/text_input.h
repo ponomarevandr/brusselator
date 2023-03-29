@@ -26,8 +26,8 @@ public:
 		input = std::make_unique<Fl_Input>(x + label_width, y, width - label_width, height);
 	};
 
-	TextInput(TextInput&& other): label_text(std::move(label_text)), label(std::move(label)),
-			input(std::move(input)) {
+	TextInput(TextInput&& other): label_text(std::move(other.label_text)),
+			label(std::move(other.label)), input(std::move(other.input)) {
 		label->label(label_text.c_str());
 		label->redraw();
 	}
@@ -41,7 +41,22 @@ public:
 		return *this;
 	}
 
-	void setLabel(const std::string&);
+	void show() {
+		label->show();
+		input->show();
+	}
+
+	void hide() {
+		label->hide();
+		input->hide();
+	}
+
+	void setLabel(const std::string& text) {
+		label_text = text;
+		label->label(label_text.c_str());
+		label->redraw();
+	}
+
 	bool isValid() const;
 	Type getValue() const;
 	void setValue(const Type&);

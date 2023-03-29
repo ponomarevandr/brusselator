@@ -30,15 +30,13 @@ private:
 	std::unique_ptr<Fl_Button> movement_button;
 	std::unique_ptr<Fl_Button> redraw_button;
 	std::unique_ptr<Fl_Button> save_button;
-	std::vector<std::unique_ptr<Fl_Box>> formula_labels;
-	std::vector<std::unique_ptr<Fl_Input>> formula_inputs;
+	std::vector<TextInput<std::string>> formula_inputs;
 	std::unique_ptr<Fl_Button> carousel_previous_button;
 	std::unique_ptr<Fl_Button> carousel_next_button;
 	std::unique_ptr<Fl_Box> carousel_index;
 	ColorInput carousel_color_input;
 	std::unique_ptr<Fl_Button> carousel_add_button;
 	std::unique_ptr<Fl_Button> carousel_remove_button;
-	std::vector<std::string> formula_labels_text;
 	std::string carousel_index_text;
 	Point zone_center;
 	Vector zone_to_corner;
