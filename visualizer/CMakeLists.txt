@@ -13,6 +13,7 @@ set(SOURCES
 	sources/viewer/viewer_window.cpp
 	sources/viewer/carousel.cpp
 	sources/viewer/text_input.cpp
+	sources/viewer/color_input.cpp
 	sources/tracker/tracker.cpp
 	sources/tracker/visual_preparator.cpp
 	sources/tracker/neighbours_base.cpp

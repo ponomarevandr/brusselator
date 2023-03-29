@@ -6,12 +6,8 @@
 #include <FL/Fl_File_Chooser.H>
 
 
-const int ViewerWindow::FLTK_COLOR[7] = {
-	FL_RED, FL_YELLOW, FL_GREEN, FL_CYAN, FL_BLUE, FL_MAGENTA, FL_BLACK
-};
-
-
 void ViewerWindow::redrawButtonCallback(Fl_Widget* widget, void* ptr) {
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
 	static_cast<ViewerWindow*>(ptr)->rebuildTracks();
 	static_cast<ViewerWindow*>(ptr)->redrawImage();
 }
@@ -34,14 +30,6 @@ void ViewerWindow::carouselPreviousButtonCallback(Fl_Widget* widget, void* ptr) 
 void ViewerWindow::carouselNextButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
 	static_cast<ViewerWindow*>(ptr)->carousel.toNext();
-	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
-}
-
-void ViewerWindow::carouselColorButtonCallback(Fl_Widget* widget, void* ptr) {
-	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
-	Plotter::Color color = static_cast<ViewerWindow*>(ptr)->carousel.getColor();
-	color = static_cast<Plotter::Color>((static_cast<size_t>(color) + 1) % 6);
-	static_cast<ViewerWindow*>(ptr)->carousel.setColor(color);
 	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
 }
 
@@ -95,8 +83,6 @@ void ViewerWindow::rebuildTracks() {
 		fl_message("Некорректные настройки!");
 		return;
 	}
-	carousel.setFormulaSymbols(0, formula_inputs[0]->value());
-	carousel.setFormulaSymbols(1, formula_inputs[1]->value());
 	if (!carousel.isValid()) {
 		fl_message("Некорректные формулы!");
 		return;
@@ -111,6 +97,7 @@ void ViewerWindow::saveToCarousel() {
 	for (size_t i = 0; i < carousel.getFormulasNumber(); ++i) {
 		carousel.setFormulaSymbols(i, formula_inputs[i]->value());
 	}
+	carousel.setColor(carousel_color_input.getColor());
 }
 
 void ViewerWindow::loadFromCarousel() {
@@ -128,8 +115,7 @@ void ViewerWindow::loadFromCarousel() {
 	}
 	carousel_index_text = std::to_string(carousel.getIndex() + 1);
 	carousel_index->label(carousel_index_text.c_str());
-	carousel_color_button->color(FLTK_COLOR[static_cast<size_t>(carousel.getColor())]);
-	carousel_color_button->redraw();
+	carousel_color_input.setColor(carousel.getColor());
 }
 
 ViewerWindow::ViewerWindow():
@@ -153,8 +139,7 @@ ViewerWindow::ViewerWindow():
 	carousel_index = std::make_unique<Fl_Box>(FL_NO_BOX, 40, 605, 40, 50, "");
 	carousel_next_button = std::make_unique<Fl_Button>(80, 605, 30, 50, ">");
 	carousel_next_button->callback(ViewerWindow::carouselNextButtonCallback, this);
-	carousel_color_button = std::make_unique<Fl_Button>(10, 660, 100, 30, "");
-	carousel_color_button->callback(ViewerWindow::carouselColorButtonCallback, this);
+	carousel_color_input = ColorInput(10, 660, 100, 30, "");
 	formula_labels_text.resize(3);
 	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 605, 40, 25, ""));
 	formula_labels.push_back(std::make_unique<Fl_Box>(FL_NO_BOX, 125, 635, 40, 25, ""));
