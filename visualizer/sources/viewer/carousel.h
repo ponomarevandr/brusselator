@@ -23,7 +23,8 @@ private:
 
 	public:
 		ElementBase(size_t formulas_number);
-		virtual Portrait getPortrait(const Frame& zone) const = 0;
+		virtual Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
+			double min_between_tracks) const = 0;
 		bool isValid() const;
 		size_t getFormulasNumber() const;
 		std::vector<std::string> getLabels() const;
@@ -36,7 +37,8 @@ private:
 	class ElementSystem: public ElementBase {
 	public:
 		ElementSystem();
-		Portrait getPortrait(const Frame& zone) const override;
+		Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
+			double min_between_tracks) const override;
 	};
 
 private:
@@ -57,5 +59,6 @@ public:
 	void setFormulaSymbols(size_t index_in_element, const std::string& symbols);
 	Plotter::Color getColor() const;
 	void setColor(Plotter::Color);
-	std::vector<Portrait> getPortraits(const Frame& zone) const;
+	std::vector<Portrait> getPortraits(const Frame& zone, double step, double max_between_tracks,
+		double min_between_tracks) const;
 };

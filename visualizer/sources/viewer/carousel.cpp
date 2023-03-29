@@ -50,9 +50,10 @@ Carousel::ElementSystem::ElementSystem(): ElementBase(2) {
 	labels[1] = "y' =";
 }
 
-Carousel::Portrait Carousel::ElementSystem::getPortrait(const Frame& zone) const {
+Carousel::Portrait Carousel::ElementSystem::getPortrait(const Frame& zone, double step,
+		double max_between_tracks, double min_between_tracks) const {
 	VectorField field(formulas[0], formulas[1]);
-	Tracker tracker(field, zone);
+	Tracker tracker(field, zone, step, max_between_tracks, min_between_tracks);
 	std::vector<SegmentedLine> tracks = tracker.getTracks();
 	VisualPreparator preparator(tracks, zone, true);
 	preparator.prepareTracks();
@@ -120,10 +121,12 @@ void Carousel::setColor(Plotter::Color color) {
 	elements[index]->setColor(color);
 }
 
-std::vector<Carousel::Portrait> Carousel::getPortraits(const Frame& zone) const {
+std::vector<Carousel::Portrait> Carousel::getPortraits(const Frame& zone, double step,
+		double max_between_tracks, double min_between_tracks) const {
 	std::vector<Portrait> result;
 	for (size_t i = 0; i < elements.size(); ++i) {
-		result.push_back(elements[i]->getPortrait(zone));
+		result.push_back(elements[i]->getPortrait(zone, step, max_between_tracks,
+			min_between_tracks));
 	}
 	return result;
 }

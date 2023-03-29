@@ -91,14 +91,20 @@ int ViewerWindow::handle(int event) {
 }
 
 void ViewerWindow::rebuildTracks() {
+	if (!step_input.isValid() || !between_input.isValid()) {
+		fl_message("Некорректные настройки!");
+		return;
+	}
 	carousel.setFormulaSymbols(0, formula_inputs[0]->value());
 	carousel.setFormulaSymbols(1, formula_inputs[1]->value());
 	if (!carousel.isValid()) {
 		fl_message("Некорректные формулы!");
 		return;
 	}
+	double min_between_tracks = 2.0 / 3.0 * between_input.getValue();
 	portraits = carousel.getPortraits(Frame(zone_center - zone_to_corner,
-		zone_center + zone_to_corner));
+		zone_center + zone_to_corner), step_input.getValue(), 2.0 * min_between_tracks,
+		min_between_tracks);
 }
 
 void ViewerWindow::saveToCarousel() {
@@ -131,6 +137,12 @@ ViewerWindow::ViewerWindow():
 		zone_center(0.0, 0.0), zone_to_corner(3.0, 2.0) {
 	graph_box = std::make_unique<Fl_Box>(10, 22, 800, 576);
 	graph_box->box(FL_UP_BOX);
+
+	step_input = TextInput<double>(820, 10, 170, 30, 85, "шаг");
+	step_input.setValue(5e-4);
+	between_input = TextInput<double>(820, 40, 170, 30, 85, "отступ");
+	between_input.setValue(0.03);
+
 	movement_button = std::make_unique<Fl_Button>(820, 428, 170, 50, "Движение");
 	redraw_button = std::make_unique<Fl_Button>(820, 488, 170, 50, "Перестроить");
 	redraw_button->callback(ViewerWindow::redrawButtonCallback, this);
