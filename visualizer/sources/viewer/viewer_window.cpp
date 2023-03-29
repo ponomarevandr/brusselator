@@ -33,13 +33,19 @@ void ViewerWindow::carouselNextButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
 }
 
-void ViewerWindow::carouselAddButtonCallback(Fl_Widget* widget, void* ptr) {
+void ViewerWindow::addSystemButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
-	static_cast<ViewerWindow*>(ptr)->carousel.addElement();
+	static_cast<ViewerWindow*>(ptr)->carousel.addElement(Carousel::ElementType::SYSTEM);
 	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
 }
 
-void ViewerWindow::carouselRemoveButtonCallback(Fl_Widget* widget, void* ptr) {
+void ViewerWindow::addFunctionButtonCallback(Fl_Widget* widget, void* ptr) {
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
+	static_cast<ViewerWindow*>(ptr)->carousel.addElement(Carousel::ElementType::FUNCTION);
+	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
+}
+
+void ViewerWindow::removeButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
 	static_cast<ViewerWindow*>(ptr)->carousel.removeElement();
 	static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
@@ -125,13 +131,20 @@ ViewerWindow::ViewerWindow():
 	step_input = TextInput<double>(820, 10, 170, 30, 85, "шаг");
 	step_input.setValue(5e-4);
 	between_input = TextInput<double>(820, 40, 170, 30, 85, "отступ");
-	between_input.setValue(0.03);
 
-	movement_button = std::make_unique<Fl_Button>(820, 428, 170, 50, "Движение");
-	redraw_button = std::make_unique<Fl_Button>(820, 488, 170, 50, "Перестроить");
+	between_input.setValue(0.03);
+	movement_button = std::make_unique<Fl_Button>(820, 440, 170, 35, "Движение");
+	redraw_button = std::make_unique<Fl_Button>(820, 480, 170, 35, "Перестроить");
 	redraw_button->callback(ViewerWindow::redrawButtonCallback, this);
-	save_button = std::make_unique<Fl_Button>(820, 548, 170, 50, "Сохранить");
+	save_button = std::make_unique<Fl_Button>(820, 520, 170, 35, "Сохранить");
 	save_button->callback(ViewerWindow::saveButtonCallback, this);
+	add_system_button = std::make_unique<Fl_Button>(820, 575, 170, 35, "Добавить систему");
+	add_system_button->callback(ViewerWindow::addSystemButtonCallback, this);
+	add_function_button = std::make_unique<Fl_Button>(820, 615, 170, 35, "Добавить функцию");
+	add_function_button->callback(ViewerWindow::addFunctionButtonCallback, this);
+	remove_button = std::make_unique<Fl_Button>(820, 655, 170, 35, "Удалить");
+	remove_button->callback(ViewerWindow::removeButtonCallback, this);
+
 	carousel_previous_button = std::make_unique<Fl_Button>(10, 605, 30, 50, "<");
 	carousel_previous_button->callback(ViewerWindow::carouselPreviousButtonCallback, this);
 	carousel_index = std::make_unique<Fl_Box>(FL_NO_BOX, 40, 605, 40, 50, "");
@@ -141,10 +154,6 @@ ViewerWindow::ViewerWindow():
 	formula_inputs.emplace_back(125, 605, 685, 25, 45);
 	formula_inputs.emplace_back(125, 635, 685, 25, 45);
 	formula_inputs.emplace_back(125, 665, 685, 25, 45);
-	carousel_add_button = std::make_unique<Fl_Button>(820, 605, 170, 40, "Добавить");
-	carousel_add_button->callback(ViewerWindow::carouselAddButtonCallback, this);
-	carousel_remove_button = std::make_unique<Fl_Button>(820, 650, 170, 40, "Удалить");
-	carousel_remove_button->callback(ViewerWindow::carouselRemoveButtonCallback, this);
 	loadFromCarousel();
 	redrawImage();
 }

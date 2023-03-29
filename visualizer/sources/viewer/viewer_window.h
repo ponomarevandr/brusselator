@@ -35,8 +35,9 @@ private:
 	std::unique_ptr<Fl_Button> carousel_next_button;
 	std::unique_ptr<Fl_Box> carousel_index;
 	ColorInput carousel_color_input;
-	std::unique_ptr<Fl_Button> carousel_add_button;
-	std::unique_ptr<Fl_Button> carousel_remove_button;
+	std::unique_ptr<Fl_Button> add_system_button;
+	std::unique_ptr<Fl_Button> add_function_button;
+	std::unique_ptr<Fl_Button> remove_button;
 	std::string carousel_index_text;
 	Point zone_center;
 	Vector zone_to_corner;
@@ -48,9 +49,9 @@ private:
 	static void saveButtonCallback(Fl_Widget* widget, void* ptr);
 	static void carouselPreviousButtonCallback(Fl_Widget* widget, void* ptr);
 	static void carouselNextButtonCallback(Fl_Widget* widget, void* ptr);
-	static void carouselColorButtonCallback(Fl_Widget* widget, void* ptr);
-	static void carouselAddButtonCallback(Fl_Widget* widget, void* ptr);
-	static void carouselRemoveButtonCallback(Fl_Widget* widget, void* ptr);
+	static void addSystemButtonCallback(Fl_Widget* widget, void* ptr);
+	static void addFunctionButtonCallback(Fl_Widget* widget, void* ptr);
+	static void removeButtonCallback(Fl_Widget* widget, void* ptr);
 	int handle(int event) override;
 	void rebuildTracks();
 	void saveToCarousel();

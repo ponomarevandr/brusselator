@@ -1,12 +1,21 @@
 #include "carousel.h"
 
-#include "geometry/vector_field.h"
 #include "tracker/tracker.h"
 #include "tracker/visual_preparator.h"
 
 
 Carousel::ElementBase::ElementBase(size_t formulas_number): labels(formulas_number),
 	formulas(formulas_number) {}
+
+Carousel::Portrait Carousel::ElementBase::getPortrait(const Frame& zone, double step,
+		double max_between_tracks, double min_between_tracks) const {
+	VectorField field = getFieldForPortrait();
+	Tracker tracker(field, zone, step, max_between_tracks, min_between_tracks);
+	std::vector<SegmentedLine> tracks = tracker.getTracks();
+	VisualPreparator preparator(tracks, zone, true);
+	preparator.prepareTracks();
+	return std::make_pair(tracks, color);
+}
 
 bool Carousel::ElementBase::isValid() const {
 	for (const FormulaXY& formula : formulas) {
@@ -50,14 +59,20 @@ Carousel::ElementSystem::ElementSystem(): ElementBase(2) {
 	labels[1] = "y' =";
 }
 
-Carousel::Portrait Carousel::ElementSystem::getPortrait(const Frame& zone, double step,
-		double max_between_tracks, double min_between_tracks) const {
-	VectorField field(formulas[0], formulas[1]);
-	Tracker tracker(field, zone, step, max_between_tracks, min_between_tracks);
-	std::vector<SegmentedLine> tracks = tracker.getTracks();
-	VisualPreparator preparator(tracks, zone, true);
-	preparator.prepareTracks();
-	return std::make_pair(tracks, color);
+VectorField Carousel::ElementSystem::getFieldForPortrait() const {
+	return VectorField(formulas[0], formulas[1]);
+}
+
+
+Carousel::ElementFunction::ElementFunction(): ElementBase(1) {
+	labels[0] = "f = ";
+}
+
+VectorField Carousel::ElementFunction::getFieldForPortrait() const {
+	FormulaXY df_dx = derivativeX(formulas[0]);
+	FormulaXY df_dy = derivativeY(formulas[0]);
+	FormulaXY minus_df_dy = FormulaXY(std::string("-(") + df_dy.getSymbols() + ")");
+	return VectorField(minus_df_dy, df_dx);
 }
 
 
@@ -73,8 +88,20 @@ void Carousel::toPrevious() {
 	index = (index + elements.size() - 1) % elements.size();
 }
 
-void Carousel::addElement() {
-	elements.insert(elements.begin() + index + 1, std::make_unique<ElementSystem>());
+void Carousel::addElement(ElementType type) {
+	std::unique_ptr<ElementBase> element;
+	switch (type) {
+	case ElementType::SYSTEM:
+		element = std::make_unique<ElementSystem>();
+		break;
+	case ElementType::FUNCTION:
+		element = std::make_unique<ElementFunction>();
+		break;
+	case ElementType::DIVERGENCY:
+
+		break;
+	}
+	elements.insert(elements.begin() + index + 1, std::move(element));
 	toNext();
 }
 

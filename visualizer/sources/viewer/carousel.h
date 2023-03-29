@@ -4,6 +4,7 @@
 #include "geometry/frame.h"
 #include "plotter/plotter.h"
 #include "formula/formula_xy.h"
+#include "geometry/vector_field.h"
 
 #include <vector>
 #include <string>
@@ -13,6 +14,11 @@
 class Carousel {
 public:
 	using Portrait = std::pair<std::vector<SegmentedLine>, Plotter::Color>;
+	enum class ElementType {
+		SYSTEM,
+		FUNCTION,
+		DIVERGENCY
+	};
 
 private:
 	class ElementBase {
@@ -23,8 +29,10 @@ private:
 
 	public:
 		ElementBase(size_t formulas_number);
-		virtual Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
-			double min_between_tracks) const = 0;
+		virtual ~ElementBase() = default;
+		virtual VectorField getFieldForPortrait() const = 0;
+		Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
+			double min_between_tracks) const;
 		bool isValid() const;
 		size_t getFormulasNumber() const;
 		std::vector<std::string> getLabels() const;
@@ -37,8 +45,13 @@ private:
 	class ElementSystem: public ElementBase {
 	public:
 		ElementSystem();
-		Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
-			double min_between_tracks) const override;
+		virtual VectorField getFieldForPortrait() const override;
+	};
+
+	class ElementFunction: public ElementBase {
+	public:
+		ElementFunction();
+		virtual VectorField getFieldForPortrait() const override;
 	};
 
 private:
@@ -49,7 +62,7 @@ public:
 	Carousel();
 	void toNext();
 	void toPrevious();
-	void addElement();
+	void addElement(ElementType);
 	void removeElement();
 	bool isValid() const;
 	size_t getIndex() const;
