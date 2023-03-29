@@ -64,15 +64,55 @@ VectorField Carousel::ElementSystem::getFieldForPortrait() const {
 }
 
 
-Carousel::ElementFunction::ElementFunction(): ElementBase(1) {
-	labels[0] = "f = ";
+Carousel::ElementLevels::ElementLevels(): ElementBase(1) {
+	labels[0] = "=f = ";
 }
 
-VectorField Carousel::ElementFunction::getFieldForPortrait() const {
+VectorField Carousel::ElementLevels::getFieldForPortrait() const {
 	FormulaXY df_dx = derivativeX(formulas[0]);
 	FormulaXY df_dy = derivativeY(formulas[0]);
-	FormulaXY minus_df_dy = FormulaXY(std::string("-(") + df_dy.getSymbols() + ")");
+	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
 	return VectorField(minus_df_dy, df_dx);
+}
+
+
+Carousel::ElementTendency::ElementTendency(): ElementBase(1) {
+	labels[0] = "<-f = ";
+}
+
+VectorField Carousel::ElementTendency::getFieldForPortrait() const {
+	FormulaXY df_dx = derivativeX(formulas[0]);
+	FormulaXY df_dy = derivativeY(formulas[0]);
+	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
+	FormulaXY vx(minus_df_dy.getSymbols() + " - (" + formulas[0].getSymbols() + ") * (" +
+		df_dx.getSymbols() + ")");
+	FormulaXY vy(df_dx.getSymbols() + " - (" + formulas[0].getSymbols() + ") * (" +
+		df_dy.getSymbols() + ")");
+	return VectorField(vx, vy);
+}
+
+
+Carousel::ElementDivergency::ElementDivergency(): ElementBase(3) {
+	labels[0] = "x' = ";
+	labels[1] = "y' = ";
+	labels[2] = "mu = ";
+}
+
+VectorField Carousel::ElementDivergency::getFieldForPortrait() const {
+	FormulaXY multiplied_x(std::string("(") + formulas[2].getSymbols() + ")*(" +
+		formulas[0].getSymbols() + ")");
+	FormulaXY multiplied_y(std::string("(") + formulas[2].getSymbols() + ")*(" +
+		formulas[1].getSymbols() + ")");
+	FormulaXY divergency(derivativeX(multiplied_x).getSymbols() + " + " +
+		derivativeY(multiplied_y).getSymbols());
+	FormulaXY df_dx = derivativeX(divergency);
+	FormulaXY df_dy = derivativeY(divergency);
+	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
+	FormulaXY vx(minus_df_dy.getSymbols() + " - (" + divergency.getSymbols() + ") * (" +
+		df_dx.getSymbols() + ")");
+	FormulaXY vy(df_dx.getSymbols() + " - (" + divergency.getSymbols() + ") * (" +
+		df_dy.getSymbols() + ")");
+	return VectorField(vx, vy);
 }
 
 
@@ -94,11 +134,14 @@ void Carousel::addElement(ElementType type) {
 	case ElementType::SYSTEM:
 		element = std::make_unique<ElementSystem>();
 		break;
-	case ElementType::FUNCTION:
-		element = std::make_unique<ElementFunction>();
+	case ElementType::LEVELS:
+		element = std::make_unique<ElementLevels>();
+		break;
+	case ElementType::TENDENCY:
+		element = std::make_unique<ElementTendency>();
 		break;
 	case ElementType::DIVERGENCY:
-
+		element = std::make_unique<ElementDivergency>();
 		break;
 	}
 	elements.insert(elements.begin() + index + 1, std::move(element));
@@ -110,6 +153,7 @@ void Carousel::removeElement() {
 	if (elements.empty())
 		elements.push_back(std::make_unique<ElementSystem>());
 	toPrevious();
+	toNext();
 }
 
 bool Carousel::isValid() const {

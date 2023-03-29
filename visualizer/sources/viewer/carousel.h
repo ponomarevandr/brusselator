@@ -16,7 +16,8 @@ public:
 	using Portrait = std::pair<std::vector<SegmentedLine>, Plotter::Color>;
 	enum class ElementType {
 		SYSTEM,
-		FUNCTION,
+		LEVELS,
+		TENDENCY,
 		DIVERGENCY
 	};
 
@@ -48,9 +49,21 @@ private:
 		virtual VectorField getFieldForPortrait() const override;
 	};
 
-	class ElementFunction: public ElementBase {
+	class ElementLevels: public ElementBase {
 	public:
-		ElementFunction();
+		ElementLevels();
+		virtual VectorField getFieldForPortrait() const override;
+	};
+
+	class ElementTendency: public ElementBase {
+	public:
+		ElementTendency();
+		virtual VectorField getFieldForPortrait() const override;
+	};
+
+	class ElementDivergency: public ElementBase {
+	public:
+		ElementDivergency();
 		virtual VectorField getFieldForPortrait() const override;
 	};
 

@@ -36,7 +36,9 @@ private:
 	std::unique_ptr<Fl_Box> carousel_index;
 	ColorInput carousel_color_input;
 	std::unique_ptr<Fl_Button> add_system_button;
-	std::unique_ptr<Fl_Button> add_function_button;
+	std::unique_ptr<Fl_Button> add_levels_button;
+	std::unique_ptr<Fl_Button> add_tendency_button;
+	std::unique_ptr<Fl_Button> add_divergency_button;
 	std::unique_ptr<Fl_Button> remove_button;
 	std::string carousel_index_text;
 	Point zone_center;
@@ -50,7 +52,9 @@ private:
 	static void carouselPreviousButtonCallback(Fl_Widget* widget, void* ptr);
 	static void carouselNextButtonCallback(Fl_Widget* widget, void* ptr);
 	static void addSystemButtonCallback(Fl_Widget* widget, void* ptr);
-	static void addFunctionButtonCallback(Fl_Widget* widget, void* ptr);
+	static void addLevelsButtonCallback(Fl_Widget* widget, void* ptr);
+	static void addTendencyButtonCallback(Fl_Widget* widget, void* ptr);
+	static void addDivergencyButtonCallback(Fl_Widget* widget, void* ptr);
 	static void removeButtonCallback(Fl_Widget* widget, void* ptr);
 	int handle(int event) override;
 	void rebuildTracks();
