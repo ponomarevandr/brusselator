@@ -17,6 +17,7 @@
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Input.H>
 
 
@@ -34,6 +35,7 @@ private:
 	std::unique_ptr<Fl_Button> carousel_previous_button;
 	std::unique_ptr<Fl_Button> carousel_next_button;
 	std::unique_ptr<Fl_Box> carousel_index;
+	std::unique_ptr<Fl_Check_Button> carousel_active_checkbox;
 	ColorInput carousel_color_input;
 	std::unique_ptr<Fl_Button> add_system_button;
 	std::unique_ptr<Fl_Button> add_levels_button;

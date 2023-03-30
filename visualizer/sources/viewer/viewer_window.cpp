@@ -122,6 +122,7 @@ void ViewerWindow::saveToCarousel() {
 		carousel.setFormulaSymbols(i, formula_inputs[i].getValue());
 	}
 	carousel.setColor(carousel_color_input.getColor());
+	carousel.setIsActive(carousel_active_checkbox->value());
 }
 
 void ViewerWindow::loadFromCarousel() {
@@ -138,6 +139,7 @@ void ViewerWindow::loadFromCarousel() {
 	carousel_index_text = std::to_string(carousel.getIndex() + 1);
 	carousel_index->label(carousel_index_text.c_str());
 	carousel_color_input.setColor(carousel.getColor());
+	carousel_active_checkbox->value(carousel.getIsActive());
 }
 
 ViewerWindow::ViewerWindow():
@@ -174,7 +176,8 @@ ViewerWindow::ViewerWindow():
 	carousel_index = std::make_unique<Fl_Box>(FL_NO_BOX, 40, 605, 40, 50, "");
 	carousel_next_button = std::make_unique<Fl_Button>(80, 605, 30, 50, ">");
 	carousel_next_button->callback(ViewerWindow::carouselNextButtonCallback, this);
-	carousel_color_input = ColorInput(10, 660, 100, 30, "");
+	carousel_color_input = ColorInput(10, 660, 60, 30, "");
+	carousel_active_checkbox = std::make_unique<Fl_Check_Button>(80, 660, 30, 30);
 	formula_inputs.emplace_back(125, 605, 685, 25, 70);
 	formula_inputs.emplace_back(125, 635, 685, 25, 70);
 	formula_inputs.emplace_back(125, 665, 685, 25, 70);

@@ -28,6 +28,7 @@ private:
 		std::vector<std::string> labels;
 		std::vector<FormulaXY> formulas;
 		Plotter::Color color = Plotter::Color::RED;
+		bool is_active = true;
 
 	public:
 		ElementBase(size_t formulas_number);
@@ -42,6 +43,8 @@ private:
 		void setFormulaSymbols(size_t index, const std::string& symbols);
 		Plotter::Color getColor() const;
 		void setColor(Plotter::Color);
+		bool getIsActive() const;
+		void setIsActive(bool);
 	};
 
 	class ElementSystem: public ElementBase {
@@ -92,6 +95,8 @@ public:
 	void setFormulaSymbols(size_t index_in_element, const std::string& symbols);
 	Plotter::Color getColor() const;
 	void setColor(Plotter::Color);
+	bool getIsActive() const;
+	void setIsActive(bool);
 	std::vector<Portrait> getPortraits(const Frame& zone, double step, double max_between_tracks,
 		double min_between_tracks) const;
 };

@@ -9,6 +9,8 @@ Carousel::ElementBase::ElementBase(size_t formulas_number): labels(formulas_numb
 
 Carousel::Portrait Carousel::ElementBase::getPortrait(const Frame& zone, double step,
 		double max_between_tracks, double min_between_tracks) const {
+	if (!is_active)
+		return std::make_pair(std::vector<SegmentedLine>(), color);	
 	VectorField field = getFieldForPortrait();
 	Tracker tracker(field, zone, step, max_between_tracks, min_between_tracks);
 	std::vector<SegmentedLine> tracks = tracker.getTracks();
@@ -18,6 +20,8 @@ Carousel::Portrait Carousel::ElementBase::getPortrait(const Frame& zone, double 
 }
 
 bool Carousel::ElementBase::isValid() const {
+	if (!is_active)
+		return true;
 	for (const FormulaXY& formula : formulas) {
 		if (!formula.isValid())
 			return false;
@@ -51,6 +55,14 @@ Plotter::Color Carousel::ElementBase::getColor() const {
 
 void Carousel::ElementBase::setColor(Plotter::Color color) {
 	this->color = color;
+}
+
+bool Carousel::ElementBase::getIsActive() const {
+	return is_active;
+}
+
+void Carousel::ElementBase::setIsActive(bool value) {
+	is_active = value;
 }
 
 
@@ -213,6 +225,14 @@ Plotter::Color Carousel::getColor() const {
 
 void Carousel::setColor(Plotter::Color color) {
 	elements[index]->setColor(color);
+}
+
+bool Carousel::getIsActive() const {
+	return elements[index]->getIsActive();
+}
+
+void Carousel::setIsActive(bool value) {
+	return elements[index]->setIsActive(value);
 }
 
 std::vector<Carousel::Portrait> Carousel::getPortraits(const Frame& zone, double step,
