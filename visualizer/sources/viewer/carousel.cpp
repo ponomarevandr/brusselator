@@ -65,7 +65,7 @@ VectorField Carousel::ElementSystem::getFieldForPortrait() const {
 
 
 Carousel::ElementLevels::ElementLevels(): ElementBase(1) {
-	labels[0] = "=f = ";
+	labels[0] = "= f =";
 }
 
 VectorField Carousel::ElementLevels::getFieldForPortrait() const {
@@ -77,7 +77,7 @@ VectorField Carousel::ElementLevels::getFieldForPortrait() const {
 
 
 Carousel::ElementTendency::ElementTendency(): ElementBase(1) {
-	labels[0] = "<-f = ";
+	labels[0] = "<- f =";
 }
 
 VectorField Carousel::ElementTendency::getFieldForPortrait() const {
@@ -92,13 +92,33 @@ VectorField Carousel::ElementTendency::getFieldForPortrait() const {
 }
 
 
-Carousel::ElementDivergency::ElementDivergency(): ElementBase(3) {
-	labels[0] = "x' = ";
-	labels[1] = "y' = ";
-	labels[2] = "mu = ";
+Carousel::ElementDivergencyLevels::ElementDivergencyLevels(): ElementBase(3) {
+	labels[0] = "= x' =";
+	labels[1] = "= y' =";
+	labels[2] = "mu =";
 }
 
-VectorField Carousel::ElementDivergency::getFieldForPortrait() const {
+VectorField Carousel::ElementDivergencyLevels::getFieldForPortrait() const {
+	FormulaXY multiplied_x(std::string("(") + formulas[2].getSymbols() + ")*(" +
+		formulas[0].getSymbols() + ")");
+	FormulaXY multiplied_y(std::string("(") + formulas[2].getSymbols() + ")*(" +
+		formulas[1].getSymbols() + ")");
+	FormulaXY divergency(derivativeX(multiplied_x).getSymbols() + " + " +
+		derivativeY(multiplied_y).getSymbols());
+	FormulaXY df_dx = derivativeX(divergency);
+	FormulaXY df_dy = derivativeY(divergency);
+	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
+	return VectorField(minus_df_dy, df_dx);
+}
+
+
+Carousel::ElementDivergencyTendency::ElementDivergencyTendency(): ElementBase(3) {
+	labels[0] = "<- x' =";
+	labels[1] = "<- y' =";
+	labels[2] = "mu =";
+}
+
+VectorField Carousel::ElementDivergencyTendency::getFieldForPortrait() const {
 	FormulaXY multiplied_x(std::string("(") + formulas[2].getSymbols() + ")*(" +
 		formulas[0].getSymbols() + ")");
 	FormulaXY multiplied_y(std::string("(") + formulas[2].getSymbols() + ")*(" +
@@ -140,8 +160,11 @@ void Carousel::addElement(ElementType type) {
 	case ElementType::TENDENCY:
 		element = std::make_unique<ElementTendency>();
 		break;
-	case ElementType::DIVERGENCY:
-		element = std::make_unique<ElementDivergency>();
+	case ElementType::DIV_LEVELS:
+		element = std::make_unique<ElementDivergencyLevels>();
+		break;
+	case ElementType::DIV_TENDENCY:
+		element = std::make_unique<ElementDivergencyTendency>();
 		break;
 	}
 	elements.insert(elements.begin() + index + 1, std::move(element));

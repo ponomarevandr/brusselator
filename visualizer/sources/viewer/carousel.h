@@ -18,7 +18,8 @@ public:
 		SYSTEM,
 		LEVELS,
 		TENDENCY,
-		DIVERGENCY
+		DIV_LEVELS,
+		DIV_TENDENCY
 	};
 
 private:
@@ -61,9 +62,15 @@ private:
 		virtual VectorField getFieldForPortrait() const override;
 	};
 
-	class ElementDivergency: public ElementBase {
+	class ElementDivergencyLevels: public ElementBase {
 	public:
-		ElementDivergency();
+		ElementDivergencyLevels();
+		virtual VectorField getFieldForPortrait() const override;
+	};
+
+	class ElementDivergencyTendency: public ElementBase {
+	public:
+		ElementDivergencyTendency();
 		virtual VectorField getFieldForPortrait() const override;
 	};
 
