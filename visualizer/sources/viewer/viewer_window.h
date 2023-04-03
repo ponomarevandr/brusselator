@@ -28,6 +28,9 @@ private:
 	std::unique_ptr<Fl_Box> graph_box;
 	TextInput<double> step_input;
 	TextInput<double> between_input;
+	TextInput<double> mouse_x_output;
+	TextInput<double> mouse_y_output;
+	TextInput<double> mouse_value_output;
 	std::unique_ptr<Fl_Button> movement_button;
 	std::unique_ptr<Fl_Button> redraw_button;
 	std::unique_ptr<Fl_Button> open_button;
@@ -51,6 +54,7 @@ private:
 	std::vector<Carousel::Portrait> portraits;
 	Carousel carousel;
 	std::string current_filename = ".ppb";
+	Frame graph_frame;
 
 private:
 	static void redrawButtonCallback(Fl_Widget* widget, void* ptr);

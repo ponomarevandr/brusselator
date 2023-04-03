@@ -107,6 +107,10 @@ VectorField Carousel::ElementSystem::getFieldForPortrait() const {
 	return VectorField(formulas[0], formulas[1]);
 }
 
+double Carousel::ElementSystem::getFunctionValue(Point point) const {
+	return 0.0;
+};
+
 Carousel::ElementType Carousel::ElementSystem::getType() const {
 	return ElementType::SYSTEM;
 }
@@ -122,6 +126,12 @@ VectorField Carousel::ElementLevels::getFieldForPortrait() const {
 	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
 	return VectorField(minus_df_dy, df_dx);
 }
+
+double Carousel::ElementLevels::getFunctionValue(Point point) const {
+	if (!is_active || !isValid())
+		return 0.0;
+	return formulas[0](point.x, point.y);
+};
 
 Carousel::ElementType Carousel::ElementLevels::getType() const {
 	return ElementType::LEVELS;
@@ -142,6 +152,12 @@ VectorField Carousel::ElementTendency::getFieldForPortrait() const {
 		df_dy.getSymbols() + ")");
 	return VectorField(vx, vy);
 }
+
+double Carousel::ElementTendency::getFunctionValue(Point point) const {
+	if (!is_active || !isValid())
+		return 0.0;
+	return formulas[0](point.x, point.y);
+};
 
 Carousel::ElementType Carousel::ElementTendency::getType() const {
 	return ElementType::TENDENCY;
@@ -166,6 +182,12 @@ VectorField Carousel::ElementDivergencyLevels::getFieldForPortrait() const {
 	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
 	return VectorField(minus_df_dy, df_dx);
 }
+
+double Carousel::ElementDivergencyLevels::getFunctionValue(Point point) const {
+	if (!is_active || !isValid())
+		return 0.0;
+	return formulas[0](point.x, point.y);
+};
 
 Carousel::ElementType Carousel::ElementDivergencyLevels::getType() const {
 	return ElementType::DIV_LEVELS;
@@ -194,6 +216,12 @@ VectorField Carousel::ElementDivergencyTendency::getFieldForPortrait() const {
 		df_dy.getSymbols() + ")");
 	return VectorField(vx, vy);
 }
+
+double Carousel::ElementDivergencyTendency::getFunctionValue(Point point) const {
+	if (!is_active || !isValid())
+		return 0.0;
+	return formulas[0](point.x, point.y);
+};
 
 Carousel::ElementType Carousel::ElementDivergencyTendency::getType() const {
 	return ElementType::DIV_TENDENCY;
@@ -294,6 +322,10 @@ std::vector<Carousel::Portrait> Carousel::getPortraits(const Frame& zone, double
 			min_between_tracks));
 	}
 	return result;
+}
+
+double Carousel::getFunctionValue(Point point) const {
+	return elements[index]->getFunctionValue(point);
 }
 
 bool Carousel::loadFromFile(const std::string& filename) {

@@ -3,6 +3,8 @@
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_File_Chooser.H>
 
+#include <iostream>
+
 
 void ViewerWindow::redrawButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
@@ -110,11 +112,20 @@ int ViewerWindow::handle(int event) {
 		case 'r':
 			rebuildTracks();
 			break;
-		default:
-			return Fl_Double_Window::handle(event);
 		}
 		redrawImage();
-		return 0;
+	}
+	if (event == FL_KEYDOWN || event == FL_MOVE || event == FL_DRAG) {
+		Point mouse(Fl::event_x(), Fl::event_y());
+		if (graph_frame.isPointInside(mouse)) {
+			Frame working_zone(zone_center - zone_to_corner, zone_center + zone_to_corner);
+			frameTranslate(graph_frame, BASIC_FRAME, mouse);
+			mouse.y = 1.0 - mouse.y;
+			frameTranslate(BASIC_FRAME, working_zone, mouse);
+			mouse_x_output.setValue(mouse.x);
+			mouse_y_output.setValue(mouse.y);
+			mouse_value_output.setValue(carousel.getFunctionValue(mouse));
+		}
 	}
 	return Fl_Double_Window::handle(event);
 }
@@ -164,10 +175,17 @@ ViewerWindow::ViewerWindow():
 		zone_center(0.0, 0.0), zone_to_corner(3.0, 2.0) {
 	graph_box = std::make_unique<Fl_Box>(10, 22, 800, 576);
 	graph_box->box(FL_UP_BOX);
+	graph_frame = Frame(Point(121, 104), Point(700, 519));
 
-	step_input = TextInput<double>(820, 10, 170, 30, 85, "шаг");
+	step_input = TextInput<double>(810, 10, 185, 30, 85, "шаг");
 	step_input.setValue(5e-4);
-	between_input = TextInput<double>(820, 40, 170, 30, 85, "отступ");
+	between_input = TextInput<double>(810, 40, 185, 30, 85, "отступ");
+	mouse_x_output = TextInput<double>(810, 90, 185, 30, 85, "x мыши");
+	mouse_x_output.setIsActive(false);
+	mouse_y_output = TextInput<double>(810, 120, 185, 30, 85, "y мыши");
+	mouse_y_output.setIsActive(false);
+	mouse_value_output = TextInput<double>(810, 150, 185, 30, 85, "значение");
+	mouse_value_output.setIsActive(false);
 
 	between_input.setValue(0.03);
 	movement_button = std::make_unique<Fl_Button>(820, 280, 170, 35, "Движение");

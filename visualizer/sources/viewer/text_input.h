@@ -57,6 +57,10 @@ public:
 		label->redraw();
 	}
 
+	void setIsActive(bool is_active) {
+		input->readonly(!is_active);
+	}
+
 	bool isValid() const;
 	Type getValue() const;
 	void setValue(const Type&);

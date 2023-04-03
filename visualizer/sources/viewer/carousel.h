@@ -34,6 +34,7 @@ private:
 		ElementBase(size_t formulas_number);
 		virtual ~ElementBase() = default;
 		virtual VectorField getFieldForPortrait() const = 0;
+		virtual double getFunctionValue(Point) const = 0;
 		virtual Carousel::ElementType getType() const = 0;
 		Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
 			double min_between_tracks) const;
@@ -54,6 +55,7 @@ private:
 	public:
 		ElementSystem();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
@@ -61,6 +63,7 @@ private:
 	public:
 		ElementLevels();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
@@ -68,6 +71,7 @@ private:
 	public:
 		ElementTendency();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
@@ -75,6 +79,7 @@ private:
 	public:
 		ElementDivergencyLevels();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
@@ -82,6 +87,7 @@ private:
 	public:
 		ElementDivergencyTendency();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
@@ -110,6 +116,7 @@ public:
 	void setIsActive(bool);
 	std::vector<Portrait> getPortraits(const Frame& zone, double step, double max_between_tracks,
 		double min_between_tracks) const;
+	double getFunctionValue(Point) const;
 	bool loadFromFile(const std::string& filename);
 	void saveToFile(const std::string& filename) const;
 };
