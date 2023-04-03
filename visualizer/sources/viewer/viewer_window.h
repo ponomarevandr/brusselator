@@ -55,6 +55,7 @@ private:
 	Carousel carousel;
 	std::string current_filename = ".ppb";
 	Frame graph_frame;
+	bool is_image_fresh;
 
 private:
 	static void redrawButtonCallback(Fl_Widget* widget, void* ptr);

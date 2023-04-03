@@ -75,7 +75,13 @@ private:
 		virtual Carousel::ElementType getType() const override;
 	};
 
-	class ElementDivergencyLevels: public ElementBase {
+	class ElementDivergency: public ElementBase {
+	public:
+		ElementDivergency();
+		FormulaXY getDivergency() const;
+	};
+
+	class ElementDivergencyLevels: public ElementDivergency {
 	public:
 		ElementDivergencyLevels();
 		virtual VectorField getFieldForPortrait() const override;
@@ -83,7 +89,7 @@ private:
 		virtual Carousel::ElementType getType() const override;
 	};
 
-	class ElementDivergencyTendency: public ElementBase {
+	class ElementDivergencyTendency: public ElementDivergency {
 	public:
 		ElementDivergencyTendency();
 		virtual VectorField getFieldForPortrait() const override;

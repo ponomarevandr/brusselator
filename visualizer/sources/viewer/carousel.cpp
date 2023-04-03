@@ -163,20 +163,26 @@ Carousel::ElementType Carousel::ElementTendency::getType() const {
 	return ElementType::TENDENCY;
 }
 
+Carousel::ElementDivergency::ElementDivergency(): ElementBase(3) {}
 
-Carousel::ElementDivergencyLevels::ElementDivergencyLevels(): ElementBase(3) {
+FormulaXY Carousel::ElementDivergency::getDivergency() const {
+	FormulaXY multiplied_x(std::string("(") + formulas[2].getSymbols() + ")*(" +
+		formulas[0].getSymbols() + ")");
+	FormulaXY multiplied_y(std::string("(") + formulas[2].getSymbols() + ")*(" +
+		formulas[1].getSymbols() + ")");
+	return FormulaXY(derivativeX(multiplied_x).getSymbols() + " + " +
+		derivativeY(multiplied_y).getSymbols());
+}
+
+
+Carousel::ElementDivergencyLevels::ElementDivergencyLevels(): ElementDivergency() {
 	labels[0] = "= x' =";
 	labels[1] = "= y' =";
 	labels[2] = "mu =";
 }
 
 VectorField Carousel::ElementDivergencyLevels::getFieldForPortrait() const {
-	FormulaXY multiplied_x(std::string("(") + formulas[2].getSymbols() + ")*(" +
-		formulas[0].getSymbols() + ")");
-	FormulaXY multiplied_y(std::string("(") + formulas[2].getSymbols() + ")*(" +
-		formulas[1].getSymbols() + ")");
-	FormulaXY divergency(derivativeX(multiplied_x).getSymbols() + " + " +
-		derivativeY(multiplied_y).getSymbols());
+	FormulaXY divergency = getDivergency();
 	FormulaXY df_dx = derivativeX(divergency);
 	FormulaXY df_dy = derivativeY(divergency);
 	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
@@ -186,7 +192,7 @@ VectorField Carousel::ElementDivergencyLevels::getFieldForPortrait() const {
 double Carousel::ElementDivergencyLevels::getFunctionValue(Point point) const {
 	if (!is_active || !isValid())
 		return 0.0;
-	return formulas[0](point.x, point.y);
+	return getDivergency()(point.x, point.y);
 };
 
 Carousel::ElementType Carousel::ElementDivergencyLevels::getType() const {
@@ -194,19 +200,14 @@ Carousel::ElementType Carousel::ElementDivergencyLevels::getType() const {
 }
 
 
-Carousel::ElementDivergencyTendency::ElementDivergencyTendency(): ElementBase(3) {
+Carousel::ElementDivergencyTendency::ElementDivergencyTendency(): ElementDivergency() {
 	labels[0] = "<- x' =";
 	labels[1] = "<- y' =";
 	labels[2] = "mu =";
 }
 
 VectorField Carousel::ElementDivergencyTendency::getFieldForPortrait() const {
-	FormulaXY multiplied_x(std::string("(") + formulas[2].getSymbols() + ")*(" +
-		formulas[0].getSymbols() + ")");
-	FormulaXY multiplied_y(std::string("(") + formulas[2].getSymbols() + ")*(" +
-		formulas[1].getSymbols() + ")");
-	FormulaXY divergency(derivativeX(multiplied_x).getSymbols() + " + " +
-		derivativeY(multiplied_y).getSymbols());
+	FormulaXY divergency = getDivergency();
 	FormulaXY df_dx = derivativeX(divergency);
 	FormulaXY df_dy = derivativeY(divergency);
 	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
@@ -220,7 +221,7 @@ VectorField Carousel::ElementDivergencyTendency::getFieldForPortrait() const {
 double Carousel::ElementDivergencyTendency::getFunctionValue(Point point) const {
 	if (!is_active || !isValid())
 		return 0.0;
-	return formulas[0](point.x, point.y);
+	return getDivergency()(point.x, point.y);
 };
 
 Carousel::ElementType Carousel::ElementDivergencyTendency::getType() const {

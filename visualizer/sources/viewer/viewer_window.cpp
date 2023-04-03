@@ -93,29 +93,32 @@ int ViewerWindow::handle(int event) {
 		switch (static_cast<char>(Fl::event_key())) {
 		case 'w':
 			zone_center += Vector(0, zone_to_corner.y * 0.1);
+			is_image_fresh = false;
 			break;
 		case 'a':
 			zone_center -= Vector(zone_to_corner.x * 0.1, 0);
+			is_image_fresh = false;
 			break;
 		case 's':
 			zone_center -= Vector(0, zone_to_corner.y * 0.1);
+			is_image_fresh = false;
 			break;
 		case 'd':
 			zone_center += Vector(zone_to_corner.x * 0.1, 0);
+			is_image_fresh = false;
 			break;
 		case '=':
 			zone_to_corner /= 1.1;
+			is_image_fresh = false;
 			break;
 		case '-':
 			zone_to_corner *= 1.1;
-			break;
-		case 'r':
-			rebuildTracks();
+			is_image_fresh = false;
 			break;
 		}
 		redrawImage();
 	}
-	if (event == FL_KEYDOWN || event == FL_MOVE || event == FL_DRAG) {
+	if ((event == FL_KEYDOWN || event == FL_MOVE || event == FL_DRAG) && is_image_fresh) {
 		Point mouse(Fl::event_x(), Fl::event_y());
 		if (graph_frame.isPointInside(mouse)) {
 			Frame working_zone(zone_center - zone_to_corner, zone_center + zone_to_corner);
@@ -143,6 +146,7 @@ void ViewerWindow::rebuildTracks() {
 	portraits = carousel.getPortraits(Frame(zone_center - zone_to_corner,
 		zone_center + zone_to_corner), step_input.getValue(), 2.0 * min_between_tracks,
 		min_between_tracks);
+	is_image_fresh = true;
 }
 
 void ViewerWindow::saveToCarousel() {
@@ -172,7 +176,7 @@ void ViewerWindow::loadFromCarousel() {
 
 ViewerWindow::ViewerWindow():
 		Fl_Double_Window(1000, 700, "Построитель фазового портрета"),
-		zone_center(0.0, 0.0), zone_to_corner(3.0, 2.0) {
+		zone_center(0.0, 0.0), zone_to_corner(3.0, 2.0), is_image_fresh(false) {
 	graph_box = std::make_unique<Fl_Box>(10, 22, 800, 576);
 	graph_box->box(FL_UP_BOX);
 	graph_frame = Frame(Point(121, 104), Point(700, 519));
