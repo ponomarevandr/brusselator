@@ -30,7 +30,9 @@ private:
 	TextInput<double> between_input;
 	std::unique_ptr<Fl_Button> movement_button;
 	std::unique_ptr<Fl_Button> redraw_button;
+	std::unique_ptr<Fl_Button> open_button;
 	std::unique_ptr<Fl_Button> save_button;
+	std::unique_ptr<Fl_Button> export_image_button;
 	std::vector<TextInput<std::string>> formula_inputs;
 	std::unique_ptr<Fl_Button> carousel_previous_button;
 	std::unique_ptr<Fl_Button> carousel_next_button;
@@ -48,10 +50,13 @@ private:
 	Vector zone_to_corner;
 	std::vector<Carousel::Portrait> portraits;
 	Carousel carousel;
+	std::string current_filename = ".ppb";
 
 private:
 	static void redrawButtonCallback(Fl_Widget* widget, void* ptr);
+	static void openButtonCallback(Fl_Widget* widget, void* ptr);
 	static void saveButtonCallback(Fl_Widget* widget, void* ptr);
+	static void exportImageButtonCallback(Fl_Widget* widget, void* ptr);
 	static void carouselPreviousButtonCallback(Fl_Widget* widget, void* ptr);
 	static void carouselNextButtonCallback(Fl_Widget* widget, void* ptr);
 	static void addSystemButtonCallback(Fl_Widget* widget, void* ptr);
@@ -68,5 +73,4 @@ private:
 public:
 	ViewerWindow();
 	void redrawImage();
-	bool saveImage(const std::string& filename) const;
 };

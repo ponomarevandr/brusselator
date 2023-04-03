@@ -34,6 +34,7 @@ private:
 		ElementBase(size_t formulas_number);
 		virtual ~ElementBase() = default;
 		virtual VectorField getFieldForPortrait() const = 0;
+		virtual Carousel::ElementType getType() const = 0;
 		Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
 			double min_between_tracks) const;
 		bool isValid() const;
@@ -45,41 +46,51 @@ private:
 		void setColor(Plotter::Color);
 		bool getIsActive() const;
 		void setIsActive(bool);
+		void serialize(std::ofstream&) const;
+		void deserialize(std::ifstream&);
 	};
 
 	class ElementSystem: public ElementBase {
 	public:
 		ElementSystem();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementLevels: public ElementBase {
 	public:
 		ElementLevels();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementTendency: public ElementBase {
 	public:
 		ElementTendency();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementDivergencyLevels: public ElementBase {
 	public:
 		ElementDivergencyLevels();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementDivergencyTendency: public ElementBase {
 	public:
 		ElementDivergencyTendency();
 		virtual VectorField getFieldForPortrait() const override;
+		virtual Carousel::ElementType getType() const override;
 	};
 
 private:
 	size_t index = 0;
 	std::vector<std::unique_ptr<ElementBase>> elements;
+
+private:
+	static std::unique_ptr<ElementBase> constructElement(ElementType);
 
 public:
 	Carousel();
@@ -99,4 +110,6 @@ public:
 	void setIsActive(bool);
 	std::vector<Portrait> getPortraits(const Frame& zone, double step, double max_between_tracks,
 		double min_between_tracks) const;
+	bool loadFromFile(const std::string& filename);
+	void saveToFile(const std::string& filename) const;
 };

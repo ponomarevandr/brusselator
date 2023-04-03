@@ -1,7 +1,5 @@
 #include "viewer_window.h"
 
-#include <cstdlib>
-
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_File_Chooser.H>
 
@@ -12,13 +10,32 @@ void ViewerWindow::redrawButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->redrawImage();
 }
 
-void ViewerWindow::saveButtonCallback(Fl_Widget* widget, void* ptr) {
-	char* filename = fl_file_chooser("Введите имя файла", ".png", ".png", 0);
+void ViewerWindow::openButtonCallback(Fl_Widget* widget, void* ptr) {
+	char* filename = fl_file_chooser("Открыть рабочее пространство", "*.ppb", ".ppb", 0);
 	if (!filename)
 		return;
-	if (!static_cast<ViewerWindow*>(ptr)->saveImage(filename))
-		fl_message("Изображение отсутствует!");
-	std::free(filename);
+	if (!static_cast<ViewerWindow*>(ptr)->carousel.loadFromFile(filename)) {
+		fl_message("Файл отсутствует!");
+	} else {
+		static_cast<ViewerWindow*>(ptr)->current_filename = filename;
+		static_cast<ViewerWindow*>(ptr)->loadFromCarousel();
+	}
+}
+
+void ViewerWindow::saveButtonCallback(Fl_Widget* widget, void* ptr) {
+	char* filename = fl_file_chooser("Сохранить рабочее пространство", "*.ppb",
+		static_cast<ViewerWindow*>(ptr)->current_filename.c_str(), 0);
+	if (!filename)
+		return;
+	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
+	static_cast<ViewerWindow*>(ptr)->carousel.saveToFile(filename);
+}
+
+void ViewerWindow::exportImageButtonCallback(Fl_Widget* widget, void* ptr) {
+	char* filename = fl_file_chooser("Экспорт изображения", "*.png", ".png", 0);
+	if (!filename)
+		return;
+	static_cast<ViewerWindow*>(ptr)->graph_image.save(filename);
 }
 
 void ViewerWindow::carouselPreviousButtonCallback(Fl_Widget* widget, void* ptr) {
@@ -153,11 +170,15 @@ ViewerWindow::ViewerWindow():
 	between_input = TextInput<double>(820, 40, 170, 30, 85, "отступ");
 
 	between_input.setValue(0.03);
-	movement_button = std::make_unique<Fl_Button>(820, 320, 170, 35, "Движение");
-	redraw_button = std::make_unique<Fl_Button>(820, 360, 170, 35, "Перестроить");
+	movement_button = std::make_unique<Fl_Button>(820, 280, 170, 35, "Движение");
+	redraw_button = std::make_unique<Fl_Button>(820, 320, 170, 35, "Перестроить");
 	redraw_button->callback(ViewerWindow::redrawButtonCallback, this);
-	save_button = std::make_unique<Fl_Button>(820, 400, 170, 35, "Сохранить");
+	open_button = std::make_unique<Fl_Button>(820, 360, 75, 35, "Открыть");
+	open_button->callback(ViewerWindow::openButtonCallback, this);
+	save_button = std::make_unique<Fl_Button>(900, 360, 90, 35, "Сохранить");
 	save_button->callback(ViewerWindow::saveButtonCallback, this);
+	export_image_button = std::make_unique<Fl_Button>(820, 400, 170, 35, "Экспорт изображения");
+	export_image_button->callback(ViewerWindow::exportImageButtonCallback, this);
 	add_system_button = std::make_unique<Fl_Button>(820, 455, 170, 35, "Cистема");
 	add_system_button->callback(ViewerWindow::addSystemButtonCallback, this);
 	add_levels_button = std::make_unique<Fl_Button>(820, 495, 170, 35, "Уровни функции");
@@ -205,11 +226,4 @@ void ViewerWindow::redrawImage() {
 		graph_image.getBuffer<unsigned char>(), graph_image.getSize());
 	graph_box->image(graph_fltk_image.get());
 	redraw();
-}
-
-bool ViewerWindow::saveImage(const std::string& filename) const {
-	if (!graph_image.isValid())
-		return false;
-	graph_image.save(filename);
-	return true;
 }

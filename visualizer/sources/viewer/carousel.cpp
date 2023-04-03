@@ -3,6 +3,8 @@
 #include "tracker/tracker.h"
 #include "tracker/visual_preparator.h"
 
+#include <fstream>
+
 
 Carousel::ElementBase::ElementBase(size_t formulas_number): labels(formulas_number),
 	formulas(formulas_number) {}
@@ -65,6 +67,36 @@ void Carousel::ElementBase::setIsActive(bool value) {
 	is_active = value;
 }
 
+void Carousel::ElementBase::serialize(std::ofstream& fout) const {
+	fout << static_cast<size_t>(getType()) << "\n";
+	fout << labels.size() << "\n";
+	for (size_t i = 0; i < labels.size(); ++i) {
+		fout << labels[i] << "\n";
+		fout << formulas[i].getSymbols() << "\n";
+	}
+	fout << static_cast<size_t>(color) << "\n";
+	fout << is_active << "\n";
+}
+
+void Carousel::ElementBase::deserialize(std::ifstream& fin) {
+	size_t formulas_number;
+	fin >> formulas_number;
+	std::string tmp;
+	std::getline(fin, tmp);
+	labels.resize(formulas_number);
+	formulas.resize(formulas_number);
+	for (size_t i = 0; i < formulas_number; ++i) {
+		std::getline(fin, labels[i]);
+		std::string symbols;
+		std::getline(fin, symbols);
+		formulas[i] = FormulaXY(symbols);
+	}
+	size_t color_as_number;
+	fin >> color_as_number;
+	color = static_cast<Plotter::Color>(color_as_number);
+	fin >> is_active;
+}
+
 
 Carousel::ElementSystem::ElementSystem(): ElementBase(2) {
 	labels[0] = "x' =";
@@ -73,6 +105,10 @@ Carousel::ElementSystem::ElementSystem(): ElementBase(2) {
 
 VectorField Carousel::ElementSystem::getFieldForPortrait() const {
 	return VectorField(formulas[0], formulas[1]);
+}
+
+Carousel::ElementType Carousel::ElementSystem::getType() const {
+	return ElementType::SYSTEM;
 }
 
 
@@ -85,6 +121,10 @@ VectorField Carousel::ElementLevels::getFieldForPortrait() const {
 	FormulaXY df_dy = derivativeY(formulas[0]);
 	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
 	return VectorField(minus_df_dy, df_dx);
+}
+
+Carousel::ElementType Carousel::ElementLevels::getType() const {
+	return ElementType::LEVELS;
 }
 
 
@@ -101,6 +141,10 @@ VectorField Carousel::ElementTendency::getFieldForPortrait() const {
 	FormulaXY vy(df_dx.getSymbols() + " - (" + formulas[0].getSymbols() + ") * (" +
 		df_dy.getSymbols() + ")");
 	return VectorField(vx, vy);
+}
+
+Carousel::ElementType Carousel::ElementTendency::getType() const {
+	return ElementType::TENDENCY;
 }
 
 
@@ -121,6 +165,10 @@ VectorField Carousel::ElementDivergencyLevels::getFieldForPortrait() const {
 	FormulaXY df_dy = derivativeY(divergency);
 	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
 	return VectorField(minus_df_dy, df_dx);
+}
+
+Carousel::ElementType Carousel::ElementDivergencyLevels::getType() const {
+	return ElementType::DIV_LEVELS;
 }
 
 
@@ -147,6 +195,27 @@ VectorField Carousel::ElementDivergencyTendency::getFieldForPortrait() const {
 	return VectorField(vx, vy);
 }
 
+Carousel::ElementType Carousel::ElementDivergencyTendency::getType() const {
+	return ElementType::DIV_TENDENCY;
+}
+
+
+std::unique_ptr<Carousel::ElementBase> Carousel::constructElement(ElementType type) {
+	switch (type) {
+	case ElementType::SYSTEM:
+		return std::make_unique<ElementSystem>();
+	case ElementType::LEVELS:
+		return std::make_unique<ElementLevels>();
+	case ElementType::TENDENCY:
+		return std::make_unique<ElementTendency>();
+	case ElementType::DIV_LEVELS:
+		return std::make_unique<ElementDivergencyLevels>();
+	case ElementType::DIV_TENDENCY:
+		return std::make_unique<ElementDivergencyTendency>();
+	default:
+		return nullptr;
+	}
+}
 
 Carousel::Carousel() {
 	elements.push_back(std::make_unique<ElementSystem>());
@@ -161,25 +230,7 @@ void Carousel::toPrevious() {
 }
 
 void Carousel::addElement(ElementType type) {
-	std::unique_ptr<ElementBase> element;
-	switch (type) {
-	case ElementType::SYSTEM:
-		element = std::make_unique<ElementSystem>();
-		break;
-	case ElementType::LEVELS:
-		element = std::make_unique<ElementLevels>();
-		break;
-	case ElementType::TENDENCY:
-		element = std::make_unique<ElementTendency>();
-		break;
-	case ElementType::DIV_LEVELS:
-		element = std::make_unique<ElementDivergencyLevels>();
-		break;
-	case ElementType::DIV_TENDENCY:
-		element = std::make_unique<ElementDivergencyTendency>();
-		break;
-	}
-	elements.insert(elements.begin() + index + 1, std::move(element));
+	elements.insert(elements.begin() + index + 1, constructElement(type));
 	toNext();
 }
 
@@ -243,4 +294,31 @@ std::vector<Carousel::Portrait> Carousel::getPortraits(const Frame& zone, double
 			min_between_tracks));
 	}
 	return result;
+}
+
+bool Carousel::loadFromFile(const std::string& filename) {
+	std::ifstream fin(filename);
+	if (!fin.is_open())
+		return false;
+	size_t elements_number;
+	fin >> elements_number;
+	elements.resize(elements_number);
+	for (size_t i = 0; i < elements.size(); ++i) {
+		ElementType type;
+		size_t type_as_number;
+		fin >> type_as_number;
+		type = static_cast<ElementType>(type_as_number);
+		elements[i] = constructElement(type);
+		elements[i]->deserialize(fin);
+	}
+	return true;
+}
+
+void Carousel::saveToFile(const std::string& filename) const {
+	std::ofstream fout(filename);
+	fout << elements.size() << "\n";
+	for (size_t i = 0; i < elements.size(); ++i) {
+		elements[i]->serialize(fout);
+	}
+	fout.close();
 }
