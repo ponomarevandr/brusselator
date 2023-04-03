@@ -5,7 +5,7 @@
 
 
 const double PI = 3.14159265358979323846;
-const double EPS = 1e-6;
+const double EPS = 1e-12;
 
 
 Point::Point(double x, double y): x(x), y(y) {}
