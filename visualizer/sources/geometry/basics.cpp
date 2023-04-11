@@ -24,6 +24,10 @@ Point& Point::operator-=(const Vector& vector) {
 	return *this;
 }
 
+bool Point::isFinite() const {
+	return std::isfinite(x) && std::isfinite(y);
+}
+
 void Point::print() const {
 	std::cout << "Point(" << x << ", " << y << ")\n";
 }
@@ -63,6 +67,10 @@ double Vector::lengthSquared() const {
 
 double Vector::length() const {
 	return std::sqrt(lengthSquared());
+}
+
+bool Vector::isFinite() const {
+	return std::isfinite(x) && std::isfinite(y);
 }
 
 void Vector::print() const {

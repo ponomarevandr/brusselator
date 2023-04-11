@@ -20,6 +20,7 @@ struct Point {
 	explicit Point(const Vector&);
 	Point& operator+=(const Vector&);
 	Point& operator-=(const Vector&);
+	bool isFinite() const;
 	void print() const;
 };
 
@@ -35,6 +36,7 @@ struct Vector {
 	Vector& operator/=(double);
 	double lengthSquared() const;
 	double length() const;
+	bool isFinite() const;
 	void print() const;
 };
 

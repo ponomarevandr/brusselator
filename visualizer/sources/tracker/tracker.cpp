@@ -42,7 +42,7 @@ void Tracker::goAlongTrack(const Point& start, double speed_sign) {
 	double latest_bounding_distance = -2.0 * bounding_step;
 	while (true) {
 		Vector speed = field.value(current);
-		if (speed.length() < EPS)
+		if (!speed.isFinite() || speed.lengthSquared() == 0)
 			break;
 		Vector direction = normalized(speed);
 		current_track.push_back(current);
