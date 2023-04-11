@@ -11,8 +11,9 @@ public:
 	double values[2][2];
 
 public:
-	Matrix22(double value_11 = 0, double value_12 = 0, double value_21 = 0, double value_22 = 0);
-	Matrix22(const std::vector<double>& values);
+	explicit Matrix22(double corresponding_number = 0);
+	Matrix22(double value_11, double value_12, double value_21, double value_22);
+	explicit Matrix22(const std::vector<double>& values);
 	explicit Matrix22(const std::string& symbols);
 	Matrix22& operator+=(const Matrix22&);
 	Matrix22& operator-=(const Matrix22&);

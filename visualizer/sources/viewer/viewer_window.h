@@ -26,28 +26,36 @@ private:
 	Plotter::Image graph_image;
 	std::unique_ptr<Fl_RGB_Image> graph_fltk_image;
 	std::unique_ptr<Fl_Box> graph_box;
+
 	TextInput<double> step_input;
 	TextInput<double> between_input;
 	TextInput<double> mouse_x_output;
 	TextInput<double> mouse_y_output;
 	TextInput<double> mouse_value_output;
+
+	std::unique_ptr<Fl_Box> coordinates_matrix_label;
+	std::vector<TextInput<double>> coordinates_matrix_inputs;
+
 	std::unique_ptr<Fl_Button> movement_button;
 	std::unique_ptr<Fl_Button> redraw_button;
 	std::unique_ptr<Fl_Button> open_button;
 	std::unique_ptr<Fl_Button> save_button;
 	std::unique_ptr<Fl_Button> export_image_button;
+
 	std::vector<TextInput<std::string>> formula_inputs;
 	std::unique_ptr<Fl_Button> carousel_previous_button;
 	std::unique_ptr<Fl_Button> carousel_next_button;
 	std::unique_ptr<Fl_Box> carousel_index;
 	std::unique_ptr<Fl_Check_Button> carousel_active_checkbox;
 	ColorInput carousel_color_input;
+
 	std::unique_ptr<Fl_Button> add_system_button;
 	std::unique_ptr<Fl_Button> add_levels_button;
 	std::unique_ptr<Fl_Button> add_tendency_button;
 	std::unique_ptr<Fl_Button> add_div_levels_button;
 	std::unique_ptr<Fl_Button> add_div_tendency_button;
 	std::unique_ptr<Fl_Button> remove_button;
+
 	std::string carousel_index_text;
 	Point zone_center;
 	Vector zone_to_corner;
@@ -74,6 +82,7 @@ private:
 	void rebuildTracks();
 	void saveToCarousel();
 	void loadFromCarousel();
+	void checkCoordinatesMatrix();
 
 public:
 	ViewerWindow();

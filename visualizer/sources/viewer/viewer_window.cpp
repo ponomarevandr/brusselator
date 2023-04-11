@@ -155,6 +155,13 @@ void ViewerWindow::saveToCarousel() {
 	}
 	carousel.setColor(carousel_color_input.getColor());
 	carousel.setIsActive(carousel_active_checkbox->value());
+	checkCoordinatesMatrix();
+	Matrix22 coordinates_matrix;
+	coordinates_matrix.values[0][0] = coordinates_matrix_inputs[0].getValue();
+	coordinates_matrix.values[0][1] = coordinates_matrix_inputs[1].getValue();
+	coordinates_matrix.values[1][0] = coordinates_matrix_inputs[2].getValue();
+	coordinates_matrix.values[1][1] = coordinates_matrix_inputs[3].getValue();
+	carousel.setCoordinatesMatrix(coordinates_matrix);
 }
 
 void ViewerWindow::loadFromCarousel() {
@@ -172,6 +179,23 @@ void ViewerWindow::loadFromCarousel() {
 	carousel_index->label(carousel_index_text.c_str());
 	carousel_color_input.setColor(carousel.getColor());
 	carousel_active_checkbox->value(carousel.getIsActive());
+	Matrix22 coordinates_matrix = carousel.getCoordinatesMatrix();
+	coordinates_matrix_inputs[0].setValue(coordinates_matrix.values[0][0]);
+	coordinates_matrix_inputs[1].setValue(coordinates_matrix.values[0][1]);
+	coordinates_matrix_inputs[2].setValue(coordinates_matrix.values[1][0]);
+	coordinates_matrix_inputs[3].setValue(coordinates_matrix.values[1][1]);
+}
+
+void ViewerWindow::checkCoordinatesMatrix() {
+	bool found = false;
+	for (size_t i = 0; i < 4; ++i) {
+		if (coordinates_matrix_inputs[i].isValid())
+			continue;
+		coordinates_matrix_inputs[i].setValue(0);
+		found = true;
+	}
+	if (found)
+		fl_message("Некорректная матрица координат! Занулено");
 }
 
 ViewerWindow::ViewerWindow():
@@ -191,27 +215,34 @@ ViewerWindow::ViewerWindow():
 	mouse_value_output = TextInput<double>(810, 150, 185, 30, 85, "значение");
 	mouse_value_output.setIsActive(false);
 
+	coordinates_matrix_label = std::make_unique<Fl_Box>(FL_NO_BOX, 820, 200, 170, 30,
+		"замена координат");
+	coordinates_matrix_inputs.emplace_back(820, 230, 80, 30, 0);
+	coordinates_matrix_inputs.emplace_back(910, 230, 80, 30, 0);
+	coordinates_matrix_inputs.emplace_back(820, 260, 80, 30, 0);
+	coordinates_matrix_inputs.emplace_back(910, 260, 80, 30, 0);
+
 	between_input.setValue(0.03);
-	movement_button = std::make_unique<Fl_Button>(820, 280, 170, 35, "Движение");
-	redraw_button = std::make_unique<Fl_Button>(820, 320, 170, 35, "Перестроить");
+	movement_button = std::make_unique<Fl_Button>(820, 330, 170, 30, "Движение");
+	redraw_button = std::make_unique<Fl_Button>(820, 365, 170, 30, "Перестроить");
 	redraw_button->callback(ViewerWindow::redrawButtonCallback, this);
-	open_button = std::make_unique<Fl_Button>(820, 360, 75, 35, "Открыть");
+	open_button = std::make_unique<Fl_Button>(820, 400, 75, 30, "Открыть");
 	open_button->callback(ViewerWindow::openButtonCallback, this);
-	save_button = std::make_unique<Fl_Button>(900, 360, 90, 35, "Сохранить");
+	save_button = std::make_unique<Fl_Button>(900, 400, 90, 30, "Сохранить");
 	save_button->callback(ViewerWindow::saveButtonCallback, this);
-	export_image_button = std::make_unique<Fl_Button>(820, 400, 170, 35, "Экспорт изображения");
+	export_image_button = std::make_unique<Fl_Button>(820, 435, 170, 30, "Экспорт изображения");
 	export_image_button->callback(ViewerWindow::exportImageButtonCallback, this);
-	add_system_button = std::make_unique<Fl_Button>(820, 455, 170, 35, "Cистема");
+	add_system_button = std::make_unique<Fl_Button>(820, 485, 170, 30, "Cистема");
 	add_system_button->callback(ViewerWindow::addSystemButtonCallback, this);
-	add_levels_button = std::make_unique<Fl_Button>(820, 495, 170, 35, "Уровни функции");
+	add_levels_button = std::make_unique<Fl_Button>(820, 520, 170, 30, "Уровни функции");
 	add_levels_button->callback(ViewerWindow::addLevelsButtonCallback, this);
-	add_tendency_button = std::make_unique<Fl_Button>(820, 535, 170, 35, "Функция к 0");
+	add_tendency_button = std::make_unique<Fl_Button>(820, 555, 170, 30, "Функция к 0");
 	add_tendency_button->callback(ViewerWindow::addTendencyButtonCallback, this);
-	add_div_levels_button = std::make_unique<Fl_Button>(820, 575, 170, 35, "Уровни дивергенции");
+	add_div_levels_button = std::make_unique<Fl_Button>(820, 590, 170, 30, "Уровни дивергенции");
 	add_div_levels_button->callback(ViewerWindow::addDivLevelsButtonCallback, this);
-	add_div_tendency_button = std::make_unique<Fl_Button>(820, 615, 170, 35, "Дивергенция к 0");
+	add_div_tendency_button = std::make_unique<Fl_Button>(820, 625, 170, 30, "Дивергенция к 0");
 	add_div_tendency_button->callback(ViewerWindow::addDivTendencyButtonCallback, this);
-	remove_button = std::make_unique<Fl_Button>(820, 655, 170, 35, "Удалить");
+	remove_button = std::make_unique<Fl_Button>(820, 660, 170, 30, "Удалить");
 	remove_button->callback(ViewerWindow::removeButtonCallback, this);
 
 	carousel_previous_button = std::make_unique<Fl_Button>(10, 605, 30, 50, "<");

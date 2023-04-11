@@ -4,6 +4,11 @@
 #include <sstream>
 
 
+Matrix22::Matrix22(double corresponding_number) {
+	values[0][0] = values[1][1] = corresponding_number;
+	values[0][1] = values[1][0] = 0;
+}
+
 Matrix22::Matrix22(double value_11, double value_12, double value_21, double value_22) {
 	values[0][0] = value_11;
 	values[0][1] = value_12;

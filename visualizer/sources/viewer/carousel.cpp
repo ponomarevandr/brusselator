@@ -7,7 +7,7 @@
 
 
 Carousel::ElementBase::ElementBase(size_t formulas_number): labels(formulas_number),
-	formulas(formulas_number) {}
+	formulas(formulas_number), coordinates_matrix(1.0) {}
 
 Carousel::Portrait Carousel::ElementBase::getPortrait(const Frame& zone, double step,
 		double max_between_tracks, double min_between_tracks) const {
@@ -28,7 +28,7 @@ bool Carousel::ElementBase::isValid() const {
 		if (!formula.isValid())
 			return false;
 	}
-	return true;
+	return coordinates_matrix.determinant() != 0;
 }
 
 size_t Carousel::ElementBase::getFormulasNumber() const {
@@ -65,6 +65,14 @@ bool Carousel::ElementBase::getIsActive() const {
 
 void Carousel::ElementBase::setIsActive(bool value) {
 	is_active = value;
+}
+
+Matrix22 Carousel::ElementBase::getCoordinatesMatrix() const {
+	return coordinates_matrix;
+}
+
+void Carousel::ElementBase::setCoordinatesMatrix(const Matrix22& matrix) {
+	coordinates_matrix = matrix;
 }
 
 void Carousel::ElementBase::serialize(std::ofstream& fout) const {
@@ -313,6 +321,14 @@ bool Carousel::getIsActive() const {
 
 void Carousel::setIsActive(bool value) {
 	return elements[index]->setIsActive(value);
+}
+
+Matrix22 Carousel::getCoordinatesMatrix() const {
+	return elements[index]->getCoordinatesMatrix();
+}
+
+void Carousel::setCoordinatesMatrix(const Matrix22& matrix) {
+	elements[index]->setCoordinatesMatrix(matrix);
 }
 
 std::vector<Carousel::Portrait> Carousel::getPortraits(const Frame& zone, double step,

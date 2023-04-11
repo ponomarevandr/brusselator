@@ -4,6 +4,7 @@
 #include "geometry/frame.h"
 #include "plotter/plotter.h"
 #include "formula/formula_xy.h"
+#include "formula/matrix_22.h"
 #include "geometry/vector_field.h"
 
 #include <vector>
@@ -29,6 +30,7 @@ private:
 		std::vector<FormulaXY> formulas;
 		Plotter::Color color = Plotter::Color::RED;
 		bool is_active = true;
+		Matrix22 coordinates_matrix;
 
 	public:
 		ElementBase(size_t formulas_number);
@@ -47,6 +49,8 @@ private:
 		void setColor(Plotter::Color);
 		bool getIsActive() const;
 		void setIsActive(bool);
+		Matrix22 getCoordinatesMatrix() const;
+		void setCoordinatesMatrix(const Matrix22&);
 		void serialize(std::ofstream&) const;
 		void deserialize(std::ifstream&);
 	};
@@ -120,6 +124,8 @@ public:
 	void setColor(Plotter::Color);
 	bool getIsActive() const;
 	void setIsActive(bool);
+	Matrix22 getCoordinatesMatrix() const;
+	void setCoordinatesMatrix(const Matrix22&);
 	std::vector<Portrait> getPortraits(const Frame& zone, double step, double max_between_tracks,
 		double min_between_tracks) const;
 	double getFunctionValue(Point) const;
