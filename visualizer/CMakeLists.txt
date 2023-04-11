@@ -18,6 +18,7 @@ set(SOURCES
 	sources/tracker/visual_preparator.cpp
 	sources/tracker/neighbours_base.cpp
 	sources/formula/formula_xy.cpp
+	sources/formula/matrix_22.cpp
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{CUSTOM_FLAGS}")
