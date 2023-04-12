@@ -131,8 +131,7 @@ Carousel::ElementLevels::ElementLevels(): ElementBase(1) {
 VectorField Carousel::ElementLevels::getFieldForPortrait() const {
 	FormulaXY df_dx = derivativeX(formulas[0]);
 	FormulaXY df_dy = derivativeY(formulas[0]);
-	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
-	return VectorField(minus_df_dy, df_dx);
+	return VectorField(unaryOperation('-', df_dy), df_dx);
 }
 
 double Carousel::ElementLevels::getFunctionValue(Point point) const {
@@ -153,11 +152,9 @@ Carousel::ElementTendency::ElementTendency(): ElementBase(1) {
 VectorField Carousel::ElementTendency::getFieldForPortrait() const {
 	FormulaXY df_dx = derivativeX(formulas[0]);
 	FormulaXY df_dy = derivativeY(formulas[0]);
-	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
-	FormulaXY vx(minus_df_dy.getSymbols() + " - (" + formulas[0].getSymbols() + ") * (" +
-		df_dx.getSymbols() + ")");
-	FormulaXY vy(df_dx.getSymbols() + " - (" + formulas[0].getSymbols() + ") * (" +
-		df_dy.getSymbols() + ")");
+	FormulaXY minus_df_dy = unaryOperation('-', df_dy);
+	FormulaXY vx(binaryOperation(minus_df_dy, '-', binaryOperation(formulas[0], '*', df_dx)));
+	FormulaXY vy(binaryOperation(df_dx, '-', binaryOperation(formulas[0], '*', df_dy)));
 	return VectorField(vx, vy);
 }
 
@@ -174,12 +171,9 @@ Carousel::ElementType Carousel::ElementTendency::getType() const {
 Carousel::ElementDivergency::ElementDivergency(): ElementBase(3) {}
 
 FormulaXY Carousel::ElementDivergency::getDivergency() const {
-	FormulaXY multiplied_x(std::string("(") + formulas[2].getSymbols() + ")*(" +
-		formulas[0].getSymbols() + ")");
-	FormulaXY multiplied_y(std::string("(") + formulas[2].getSymbols() + ")*(" +
-		formulas[1].getSymbols() + ")");
-	return FormulaXY(derivativeX(multiplied_x).getSymbols() + " + " +
-		derivativeY(multiplied_y).getSymbols());
+	FormulaXY multiplied_x(binaryOperation(formulas[2], '*', formulas[0]));
+	FormulaXY multiplied_y(binaryOperation(formulas[2], '*', formulas[1]));
+	return binaryOperation(derivativeX(multiplied_x), '+', derivativeY(multiplied_y));
 }
 
 
@@ -193,7 +187,7 @@ VectorField Carousel::ElementDivergencyLevels::getFieldForPortrait() const {
 	FormulaXY divergency = getDivergency();
 	FormulaXY df_dx = derivativeX(divergency);
 	FormulaXY df_dy = derivativeY(divergency);
-	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
+	FormulaXY minus_df_dy(unaryOperation('-', df_dy));
 	return VectorField(minus_df_dy, df_dx);
 }
 
@@ -218,11 +212,9 @@ VectorField Carousel::ElementDivergencyTendency::getFieldForPortrait() const {
 	FormulaXY divergency = getDivergency();
 	FormulaXY df_dx = derivativeX(divergency);
 	FormulaXY df_dy = derivativeY(divergency);
-	FormulaXY minus_df_dy(std::string("-(") + df_dy.getSymbols() + ")");
-	FormulaXY vx(minus_df_dy.getSymbols() + " - (" + divergency.getSymbols() + ") * (" +
-		df_dx.getSymbols() + ")");
-	FormulaXY vy(df_dx.getSymbols() + " - (" + divergency.getSymbols() + ") * (" +
-		df_dy.getSymbols() + ")");
+	FormulaXY minus_df_dy(unaryOperation('-', df_dy));
+	FormulaXY vx(binaryOperation(minus_df_dy, '-', binaryOperation(divergency, '*', df_dx)));
+	FormulaXY vy(binaryOperation(df_dx, '-', binaryOperation(divergency, '*', df_dy)));
 	return VectorField(vx, vy);
 }
 

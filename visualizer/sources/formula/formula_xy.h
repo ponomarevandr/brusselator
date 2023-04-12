@@ -32,4 +32,5 @@ public:
 
 FormulaXY derivativeX(const FormulaXY&);
 FormulaXY derivativeY(const FormulaXY&);
-FormulaXY divergency(const FormulaXY&);
+FormulaXY unaryOperation(char operation, const FormulaXY& formula);
+FormulaXY binaryOperation(const FormulaXY& left, char operation, const FormulaXY& right);

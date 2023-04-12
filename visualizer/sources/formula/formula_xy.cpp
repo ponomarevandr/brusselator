@@ -72,12 +72,10 @@ FormulaXY derivativeY(const FormulaXY& function) {
 	return FormulaXY(evaluator);
 }
 
-FormulaXY divergency(const FormulaXY& function) {
-	void* evaluator_x = evaluator_derivative_x(function.evaluator);
-	void* evaluator_y = evaluator_derivative_y(function.evaluator);
-	std::string symbols_derivative_x = std::string(evaluator_get_string(evaluator_x));
-	std::string symbols_derivative_y = std::string(evaluator_get_string(evaluator_y));
-	evaluator_destroy(evaluator_x);
-	evaluator_destroy(evaluator_y);
-	return FormulaXY(symbols_derivative_x + " + " + symbols_derivative_y);
+FormulaXY unaryOperation(char operation, const FormulaXY& formula) {
+	return FormulaXY(std::string(1, operation) + "(" + formula.getSymbols() + ")");
+}
+
+FormulaXY binaryOperation(const FormulaXY& left, char operation, const FormulaXY& right) {
+	return FormulaXY("(" + left.getSymbols() + ")" + operation + "(" + right.getSymbols() + ")");
 }
