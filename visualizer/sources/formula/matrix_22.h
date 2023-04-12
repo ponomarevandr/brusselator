@@ -20,6 +20,7 @@ public:
 	Matrix22& operator*=(double);
 	Matrix22& operator/=(double);
 	double determinant() const;
+	std::string asString() const;
 	void print() const;
 };
 

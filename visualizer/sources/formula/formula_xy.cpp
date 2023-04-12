@@ -79,3 +79,25 @@ FormulaXY unaryOperation(char operation, const FormulaXY& formula) {
 FormulaXY binaryOperation(const FormulaXY& left, char operation, const FormulaXY& right) {
 	return FormulaXY("(" + left.getSymbols() + ")" + operation + "(" + right.getSymbols() + ")");
 }
+
+std::string substituteAtSymbol(const std::string& main, char symbol, const std::string& sub) {
+	std::string result;
+	for (char current : main) {
+		if (current != symbol) {
+			result.push_back(current);
+			continue;
+		}
+		for (char from_sub : sub) {
+			result.push_back(from_sub);
+		}
+	}
+	return result;
+}
+
+FormulaXY substitution(const FormulaXY& main, const FormulaXY& sub_x, const FormulaXY& sub_y) {
+	std::string result_symbols = main.getSymbols();
+	result_symbols = substituteAtSymbol(result_symbols, 'y', "u");
+	result_symbols = substituteAtSymbol(result_symbols, 'x', "(" + sub_x.getSymbols() + ")");
+	result_symbols = substituteAtSymbol(result_symbols, 'u', "(" + sub_y.getSymbols() + ")");
+	return FormulaXY(result_symbols);
+}

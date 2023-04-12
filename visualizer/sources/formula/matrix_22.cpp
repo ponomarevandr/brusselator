@@ -69,6 +69,12 @@ double Matrix22::determinant() const {
 	return values[0][0] * values[1][1] - values[0][1] * values[1][0];
 }
 
+std::string Matrix22::asString() const {
+	std::stringstream stream;
+	stream << values[0][0] << "; " << values[0][1] << "; " << values[1][0] << "; " << values[1][1];
+	return stream.str();
+}
+
 void Matrix22::print() const {
 	std::cout << "Matrix(\n" << values[0][0] << "; " << values[0][1] << "\n" <<
 		values[1][0] << "; " << values[1][1] << "\n)\n";

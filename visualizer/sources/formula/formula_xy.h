@@ -34,3 +34,5 @@ FormulaXY derivativeX(const FormulaXY&);
 FormulaXY derivativeY(const FormulaXY&);
 FormulaXY unaryOperation(char operation, const FormulaXY& formula);
 FormulaXY binaryOperation(const FormulaXY& left, char operation, const FormulaXY& right);
+std::string substituteAtSymbol(const std::string& main, char symbol, const std::string& sub);
+FormulaXY substitution(const FormulaXY& main, const FormulaXY& sub_x, const FormulaXY& sub_y);

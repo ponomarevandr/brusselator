@@ -32,10 +32,15 @@ private:
 		bool is_active = true;
 		Matrix22 coordinates_matrix;
 
+	protected:
+		virtual VectorField getFieldForPortrait() const = 0;
+		static FormulaXY getSubstitutionX(const Matrix22&);
+		static FormulaXY getSubstitutionY(const Matrix22&);
+		static FormulaXY matrixSubstitution(const FormulaXY&, const Matrix22&);
+
 	public:
 		ElementBase(size_t formulas_number);
 		virtual ~ElementBase() = default;
-		virtual VectorField getFieldForPortrait() const = 0;
 		virtual double getFunctionValue(Point) const = 0;
 		virtual Carousel::ElementType getType() const = 0;
 		Portrait getPortrait(const Frame& zone, double step, double max_between_tracks,
@@ -56,47 +61,59 @@ private:
 	};
 
 	class ElementSystem: public ElementBase {
+	protected:
+		virtual VectorField getFieldForPortrait() const override;
+
 	public:
 		ElementSystem();
-		virtual VectorField getFieldForPortrait() const override;
 		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementLevels: public ElementBase {
+	protected:
+		virtual VectorField getFieldForPortrait() const override;
+
 	public:
 		ElementLevels();
-		virtual VectorField getFieldForPortrait() const override;
 		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementTendency: public ElementBase {
+	protected:
+		virtual VectorField getFieldForPortrait() const override;
+
 	public:
 		ElementTendency();
-		virtual VectorField getFieldForPortrait() const override;
 		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementDivergency: public ElementBase {
+	protected:
+		FormulaXY getDivergency() const;
+
 	public:
 		ElementDivergency();
-		FormulaXY getDivergency() const;
 	};
 
 	class ElementDivergencyLevels: public ElementDivergency {
+	protected:
+		virtual VectorField getFieldForPortrait() const override;
+
 	public:
 		ElementDivergencyLevels();
-		virtual VectorField getFieldForPortrait() const override;
 		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};
 
 	class ElementDivergencyTendency: public ElementDivergency {
+	protected:
+		virtual VectorField getFieldForPortrait() const override;
+
 	public:
 		ElementDivergencyTendency();
-		virtual VectorField getFieldForPortrait() const override;
 		virtual double getFunctionValue(Point) const override;
 		virtual Carousel::ElementType getType() const override;
 	};

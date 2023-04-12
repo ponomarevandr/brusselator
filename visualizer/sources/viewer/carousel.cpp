@@ -3,11 +3,31 @@
 #include "tracker/tracker.h"
 #include "tracker/visual_preparator.h"
 
+#include <iostream>
 #include <fstream>
+#include <sstream>
 
 
 Carousel::ElementBase::ElementBase(size_t formulas_number): labels(formulas_number),
 	formulas(formulas_number), coordinates_matrix(1.0) {}
+
+FormulaXY Carousel::ElementBase::getSubstitutionX(const Matrix22& matrix) {
+	std::stringstream stream;
+	stream << matrix.values[0][0] << "*x + " << matrix.values[0][1] << "*y";
+	return FormulaXY(stream.str());
+}
+
+FormulaXY Carousel::ElementBase::getSubstitutionY(const Matrix22& matrix) {
+	std::stringstream stream;
+	stream << matrix.values[1][0] << "*x + " << matrix.values[1][1] << "*y";
+	return FormulaXY(stream.str());
+}
+
+FormulaXY Carousel::ElementBase::matrixSubstitution(const FormulaXY& formula,
+		const Matrix22& matrix) {
+	return substitution(formula, getSubstitutionX(matrix), getSubstitutionY(matrix));
+}
+
 
 Carousel::Portrait Carousel::ElementBase::getPortrait(const Frame& zone, double step,
 		double max_between_tracks, double min_between_tracks) const {
@@ -82,6 +102,7 @@ void Carousel::ElementBase::serialize(std::ofstream& fout) const {
 		fout << labels[i] << "\n";
 		fout << formulas[i].getSymbols() << "\n";
 	}
+	fout << coordinates_matrix.asString() << "\n";
 	fout << static_cast<size_t>(color) << "\n";
 	fout << is_active << "\n";
 }
@@ -99,6 +120,9 @@ void Carousel::ElementBase::deserialize(std::ifstream& fin) {
 		std::getline(fin, symbols);
 		formulas[i] = FormulaXY(symbols);
 	}
+	std::string coordinates_matrix_string;
+	std::getline(fin, coordinates_matrix_string);
+	coordinates_matrix = Matrix22(coordinates_matrix_string);
 	size_t color_as_number;
 	fin >> color_as_number;
 	color = static_cast<Plotter::Color>(color_as_number);
@@ -112,7 +136,11 @@ Carousel::ElementSystem::ElementSystem(): ElementBase(2) {
 }
 
 VectorField Carousel::ElementSystem::getFieldForPortrait() const {
-	return VectorField(formulas[0], formulas[1]);
+	FormulaXY vx_tmp = matrixSubstitution(formulas[0], coordinates_matrix);
+	FormulaXY vy_tmp = matrixSubstitution(formulas[1], coordinates_matrix);
+	FormulaXY vx = substitution(getSubstitutionX(inverse(coordinates_matrix)), vx_tmp, vy_tmp);
+	FormulaXY vy = substitution(getSubstitutionY(inverse(coordinates_matrix)), vx_tmp, vy_tmp);
+	return VectorField(vx, vy);
 }
 
 double Carousel::ElementSystem::getFunctionValue(Point point) const {
@@ -129,15 +157,17 @@ Carousel::ElementLevels::ElementLevels(): ElementBase(1) {
 }
 
 VectorField Carousel::ElementLevels::getFieldForPortrait() const {
-	FormulaXY df_dx = derivativeX(formulas[0]);
-	FormulaXY df_dy = derivativeY(formulas[0]);
+	FormulaXY transformed = matrixSubstitution(formulas[0], coordinates_matrix);
+	FormulaXY df_dx = derivativeX(transformed);
+	FormulaXY df_dy = derivativeY(transformed);
 	return VectorField(unaryOperation('-', df_dy), df_dx);
 }
 
 double Carousel::ElementLevels::getFunctionValue(Point point) const {
 	if (!is_active || !isValid())
 		return 0.0;
-	return formulas[0](point.x, point.y);
+	FormulaXY transformed = matrixSubstitution(formulas[0], coordinates_matrix);
+	return transformed(point.x, point.y);
 };
 
 Carousel::ElementType Carousel::ElementLevels::getType() const {
@@ -150,18 +180,20 @@ Carousel::ElementTendency::ElementTendency(): ElementBase(1) {
 }
 
 VectorField Carousel::ElementTendency::getFieldForPortrait() const {
-	FormulaXY df_dx = derivativeX(formulas[0]);
-	FormulaXY df_dy = derivativeY(formulas[0]);
+	FormulaXY transformed = matrixSubstitution(formulas[0], coordinates_matrix);
+	FormulaXY df_dx = derivativeX(transformed);
+	FormulaXY df_dy = derivativeY(transformed);
 	FormulaXY minus_df_dy = unaryOperation('-', df_dy);
-	FormulaXY vx(binaryOperation(minus_df_dy, '-', binaryOperation(formulas[0], '*', df_dx)));
-	FormulaXY vy(binaryOperation(df_dx, '-', binaryOperation(formulas[0], '*', df_dy)));
+	FormulaXY vx = binaryOperation(minus_df_dy, '-', binaryOperation(formulas[0], '*', df_dx));
+	FormulaXY vy = binaryOperation(df_dx, '-', binaryOperation(formulas[0], '*', df_dy));
 	return VectorField(vx, vy);
 }
 
 double Carousel::ElementTendency::getFunctionValue(Point point) const {
 	if (!is_active || !isValid())
 		return 0.0;
-	return formulas[0](point.x, point.y);
+	FormulaXY transformed = matrixSubstitution(formulas[0], coordinates_matrix);
+	return transformed(point.x, point.y);
 };
 
 Carousel::ElementType Carousel::ElementTendency::getType() const {
@@ -171,8 +203,12 @@ Carousel::ElementType Carousel::ElementTendency::getType() const {
 Carousel::ElementDivergency::ElementDivergency(): ElementBase(3) {}
 
 FormulaXY Carousel::ElementDivergency::getDivergency() const {
-	FormulaXY multiplied_x(binaryOperation(formulas[2], '*', formulas[0]));
-	FormulaXY multiplied_y(binaryOperation(formulas[2], '*', formulas[1]));
+	FormulaXY vx_tmp = matrixSubstitution(formulas[0], coordinates_matrix);
+	FormulaXY vy_tmp = matrixSubstitution(formulas[1], coordinates_matrix);
+	FormulaXY vx = substitution(getSubstitutionX(inverse(coordinates_matrix)), vx_tmp, vy_tmp);
+	FormulaXY vy = substitution(getSubstitutionY(inverse(coordinates_matrix)), vx_tmp, vy_tmp);
+	FormulaXY multiplied_x = binaryOperation(formulas[2], '*', vx);
+	FormulaXY multiplied_y = binaryOperation(formulas[2], '*', vy);
 	return binaryOperation(derivativeX(multiplied_x), '+', derivativeY(multiplied_y));
 }
 
@@ -187,7 +223,7 @@ VectorField Carousel::ElementDivergencyLevels::getFieldForPortrait() const {
 	FormulaXY divergency = getDivergency();
 	FormulaXY df_dx = derivativeX(divergency);
 	FormulaXY df_dy = derivativeY(divergency);
-	FormulaXY minus_df_dy(unaryOperation('-', df_dy));
+	FormulaXY minus_df_dy = unaryOperation('-', df_dy);
 	return VectorField(minus_df_dy, df_dx);
 }
 
@@ -212,9 +248,9 @@ VectorField Carousel::ElementDivergencyTendency::getFieldForPortrait() const {
 	FormulaXY divergency = getDivergency();
 	FormulaXY df_dx = derivativeX(divergency);
 	FormulaXY df_dy = derivativeY(divergency);
-	FormulaXY minus_df_dy(unaryOperation('-', df_dy));
-	FormulaXY vx(binaryOperation(minus_df_dy, '-', binaryOperation(divergency, '*', df_dx)));
-	FormulaXY vy(binaryOperation(df_dx, '-', binaryOperation(divergency, '*', df_dy)));
+	FormulaXY minus_df_dy = unaryOperation('-', df_dy);
+	FormulaXY vx = binaryOperation(minus_df_dy, '-', binaryOperation(divergency, '*', df_dx));
+	FormulaXY vy = binaryOperation(df_dx, '-', binaryOperation(divergency, '*', df_dy));
 	return VectorField(vx, vy);
 }
 
