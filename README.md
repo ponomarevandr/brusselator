@@ -19,3 +19,6 @@
 
 ### Тезис
 [документ](https://github.com/ponomarevandr/brusselator/blob/presentations/presentations/brusselator_thesis.pdf)
+
+### Набросок доклада
+[документ](https://github.com/ponomarevandr/brusselator/blob/presentations/presentations/brusselator_report.pdf)
