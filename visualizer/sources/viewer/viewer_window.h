@@ -7,6 +7,9 @@
 #include "viewer/text_input.h"
 #include "viewer/color_input.h"
 
+#include "image_processing/image_loader.h"
+#include "image_processing/image_portrait.h"
+
 #include <vector>
 #include <string>
 #include <memory>
@@ -56,6 +59,9 @@ private:
 	std::string current_filename = ".ppb";
 	Frame graph_frame;
 	bool is_image_fresh;
+
+	ImageLoader image_loader;
+	ImagePortrait image_portrait;
 
 private:
 	static void redrawButtonCallback(Fl_Widget* widget, void* ptr);

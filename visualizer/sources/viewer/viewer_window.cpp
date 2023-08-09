@@ -3,8 +3,6 @@
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_File_Chooser.H>
 
-#include <iostream>
-
 
 void ViewerWindow::redrawButtonCallback(Fl_Widget* widget, void* ptr) {
 	static_cast<ViewerWindow*>(ptr)->saveToCarousel();
@@ -146,6 +144,11 @@ void ViewerWindow::rebuildTracks() {
 	portraits = carousel.getPortraits(Frame(zone_center - zone_to_corner,
 		zone_center + zone_to_corner), step_input.getValue(), 2.0 * min_between_tracks,
 		min_between_tracks);
+
+	portraits.insert(portraits.begin(), image_portrait.getPortrait(Frame(zone_center -
+		zone_to_corner, zone_center + zone_to_corner), step_input.getValue(),
+		2.0 * min_between_tracks, min_between_tracks));
+
 	is_image_fresh = true;
 }
 
@@ -176,7 +179,8 @@ void ViewerWindow::loadFromCarousel() {
 
 ViewerWindow::ViewerWindow():
 		Fl_Double_Window(1000, 700, "Построитель фазового портрета"),
-		zone_center(0.0, 0.0), zone_to_corner(3.0, 2.0), is_image_fresh(false) {
+		zone_center(250.0, 200.0), zone_to_corner(250.0, 200.0), is_image_fresh(false),
+		image_loader("liz.png"), image_portrait(image_loader) {
 	graph_box = std::make_unique<Fl_Box>(10, 22, 800, 576);
 	graph_box->box(FL_UP_BOX);
 	graph_frame = Frame(Point(121, 104), Point(700, 519));
@@ -226,6 +230,9 @@ ViewerWindow::ViewerWindow():
 	formula_inputs.emplace_back(125, 665, 685, 25, 70);
 	loadFromCarousel();
 	redrawImage();
+
+	image_loader.load();
+	image_portrait.prepare();
 }
 
 void ViewerWindow::redrawImage() {

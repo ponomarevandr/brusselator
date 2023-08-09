@@ -20,6 +20,8 @@ set(SOURCES
 	sources/formula/formula_xy.cpp
 
 	sources/image_processing/image_loader.cpp
+	sources/image_processing/image_direction.cpp
+	sources/image_processing/image_portrait.cpp
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} $ENV{CUSTOM_FLAGS}")

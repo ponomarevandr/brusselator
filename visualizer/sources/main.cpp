@@ -1,17 +1,21 @@
 #include "viewer/application.h"
 
 #include "image_processing/image_loader.h"
+#include "image_processing/image_direction.h"
 
 #include <iostream>
 
 
 int main(int argc, char* argv[]) {
-	//Application application;
-	//application.run(argc, argv);
-	ImageLoader image("liz.png");
+	Application application;
+	application.run(argc, argv);
+	/*ImageLoader image("liz.png");
 	image.load();
-	std::cout << static_cast<size_t>(image.getPixelR(639, 639)) << "\n";
-	std::cout << static_cast<size_t>(image.getPixelG(639, 639)) << "\n";
-	std::cout << static_cast<size_t>(image.getPixelB(639, 639)) << "\n";
-	std::cout << image.getPixelV(639, 639) << "\n";
+	ImageDirection direction(image, 3);
+	direction.calculate();
+	while (true) {
+		size_t x, y;
+		std::cin >> x >> y;
+		direction.getDirection(x, y).print();
+	}*/
 }
