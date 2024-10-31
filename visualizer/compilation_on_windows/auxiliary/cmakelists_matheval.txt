@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.0)
+
+
+project(Matheval)
+
+set(SOURCES
+	lib/error.c
+	lib/g77_interface.c
+	lib/matheval.c
+	lib/node.c
+	lib/parser.c
+	lib/scanner.c
+	lib/symbol_table.c
+	lib/xmalloc.c
+	lib/xmath.c
+)
+
+include_directories(${PROJECT_SOURCE_DIR}/lib)
+
+add_library(matheval ${SOURCES})
